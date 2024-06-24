@@ -1,11 +1,11 @@
-import "./style.css";
-import Icon from "./icon.png";
-import "./types"
+import "./resources/style.css";
+import Icon from "./resources/icon.png";
+import "./testScript"
 
 function component() {
   const element = document.createElement("div");
 
-  element.innerHTML = ["Hello", "webpack", 123, 456].join(" ");
+  element.innerHTML = "Page contents WIP";
   // element.classList.add("hello");
 
   // const myIcon = new Image();
