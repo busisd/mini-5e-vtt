@@ -56,6 +56,7 @@ export type AttackRollResult = {
 export type DamageResult = {
   rolls: DamageDieRoll[];
   damageByType: DamageTypeMap;
+  totalDamage: number;
 };
 
 export class AttackAction {
@@ -141,9 +142,15 @@ export class AttackAction {
 
     damageByType[baseDamageType] += this.damageModFormula(attacker);
 
+    const totalDamage = Object.values(damageByType).reduce(
+      (total, current) => total + current,
+      0,
+    );
+
     return {
       rolls: damageRolls,
       damageByType,
+      totalDamage,
     };
   }
 }
