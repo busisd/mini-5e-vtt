@@ -28,19 +28,24 @@ export class Character {
       extraDice = [] as DamageDie[],
     } = {},
   ) {
-    const { result, rolls, chosenDie } = attack.rollToHit(this, {
+    const attackResult = attack.rollToHit(this, {
       advantage,
       disadvantage,
       advantageDice,
       disadvantageDice,
     });
-    // TODO: Return these results instead of logging them
-    console.log(result, JSON.stringify(rolls));
-    const isCritical = chosenDie.result === 20;
+    // TODO: Remove these logs
+    console.log(attackResult.result, JSON.stringify(attackResult.rolls));
+    const isCritical = attackResult.chosenDie.result === 20;
     console.log("Is critical hit?", isCritical);
 
-    const damageResults = attack.rollDamage(this, { isCritical, extraDice });
-    console.log(JSON.stringify(damageResults));
+    const damageResult = attack.rollDamage(this, { isCritical, extraDice });
+    console.log(JSON.stringify(damageResult));
+
+    return {
+      attackResult,
+      damageResult,
+    };
   }
 }
 
@@ -49,14 +54,13 @@ export type DamageModFormula = (c: Character) => number;
 
 export type AttackRollResult = {
   result: number;
-  chosenDie: DieRoll;
   rolls: DieRoll[];
+  chosenDie: DieRoll;
 };
-
-export type DamageResult = {
+export type DamageRollResult = {
+  totalDamage: number;
   rolls: DamageDieRoll[];
   damageByType: DamageTypeMap;
-  totalDamage: number;
 };
 
 export class AttackAction {
@@ -111,7 +115,7 @@ export class AttackAction {
       extraDice = [] as DamageDie[],
       extraNonDoubledDice = [] as DamageDie[],
     } = {},
-  ): DamageResult {
+  ): DamageRollResult {
     const baseDamageDie = this.damageDice[0];
     const baseDamageType = baseDamageDie.damageType;
 
