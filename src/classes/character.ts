@@ -56,6 +56,7 @@ export type AttackRollResult = {
   result: number;
   rolls: DieRoll[];
   chosenDie: DieRoll;
+  modifier: number;
 };
 export type DamageRollResult = {
   totalDamage: number;
@@ -100,10 +101,12 @@ export class AttackAction {
       chosenDie = rolls[0];
     }
 
+    const modifier = this.attackModFormula(attacker);
     return {
-      result: minOne(chosenDie.result + this.attackModFormula(attacker)),
-      chosenDie,
+      result: minOne(chosenDie.result + modifier),
       rolls,
+      chosenDie,
+      modifier,
     };
   }
 

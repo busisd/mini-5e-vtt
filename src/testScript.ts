@@ -5,9 +5,10 @@ import {
   WeaponAttack,
 } from "./classes/character";
 import { DamageType } from "./classes/damageTypes";
-import { DamageDie, DamageDieRoll, DieRoll } from "./classes/dice";
+import { DamageDie } from "./classes/dice";
 import { Stat } from "./classes/stats";
-import { d20Svg, plaintextSvg, sidesToSvg, svgElement } from "./svg/diceSvg";
+import { addAttackRolls, addDamageRolls } from "./components/rollDisplays";
+import { plaintextSvg, svgElement } from "./svg/diceSvg";
 
 function makeStatArray(stats: number[]) {
   return {
@@ -35,14 +36,17 @@ const greatAxe = new WeaponAttack(Stat.STR, [
 const longsword2H = new WeaponAttack(Stat.STR, [
   new DamageDie(10, DamageType.SLASHING),
 ]);
+const lotsOfD6Attack = new WeaponAttack(Stat.STR, [
+  new DamageDie(6, DamageType.SLASHING),
+  new DamageDie(6, DamageType.SLASHING),
+  new DamageDie(6, DamageType.SLASHING),
+  new DamageDie(6, DamageType.SLASHING),
+  new DamageDie(6, DamageType.SLASHING),
+  new DamageDie(6, DamageType.SLASHING),
+]);
 
-const addRolls = (rolls: DieRoll[]) => {
-  for (const roll of rolls) {
-    document.body.appendChild(
-      svgElement(sidesToSvg(roll.sides)(String(roll.result))),
-    );
-  }
-};
+const zero = new Character(makeStatArray([10, 10, 10, 10, 10, 10]), 0);
+const weakling = new Character(makeStatArray([4, 6, 10, 10, 10, 10]), 0);
 
 const addResults = ({
   attackResult,
@@ -51,8 +55,9 @@ const addResults = ({
   attackResult: AttackRollResult;
   damageResult: DamageRollResult;
 }) => {
-  addRolls(attackResult.rolls);
-  addRolls(damageResult.rolls);
+  addAttackRolls(attackResult);
+  document.body.appendChild(document.createElement("br"));
+  addDamageRolls(damageResult.rolls);
 };
 
 console.log(goblin, shortbow);
@@ -98,6 +103,20 @@ addResults(
 );
 document.body.appendChild(document.createElement("br"));
 
+console.log("Zero:");
+document.body.appendChild(svgElement(plaintextSvg("Zero:", { width: 2000 })));
+document.body.appendChild(document.createElement("br"));
+addResults(zero.useAttack(longsword2H));
+document.body.appendChild(document.createElement("br"));
+
+console.log("Weakling:");
+document.body.appendChild(
+  svgElement(plaintextSvg("Weakling:", { width: 2000 })),
+);
+document.body.appendChild(document.createElement("br"));
+addResults(weakling.useAttack(longsword2H));
+document.body.appendChild(document.createElement("br"));
+
 console.log("D10 damage with disadvantage:");
 document.body.appendChild(
   svgElement(plaintextSvg("D10 damage with disadvantage:", { width: 2000 })),
@@ -122,6 +141,22 @@ addResults(
     extraDice: [
       new DamageDie(6, DamageType.LIGHTNING),
       new DamageDie(4, DamageType.SLASHING),
+    ],
+  }),
+);
+document.body.appendChild(document.createElement("br"));
+
+console.log("Lots of D6:");
+document.body.appendChild(
+  svgElement(plaintextSvg("Lots of D6:", { width: 2000 })),
+);
+document.body.appendChild(document.createElement("br"));
+addResults(
+  goblin.useAttack(lotsOfD6Attack, {
+    advantage: true,
+    extraDice: [
+      new DamageDie(6, DamageType.LIGHTNING),
+      new DamageDie(6, DamageType.LIGHTNING),
     ],
   }),
 );
