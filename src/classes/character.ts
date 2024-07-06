@@ -26,6 +26,7 @@ export class Character {
       advantageDice = 2,
       disadvantageDice = 2,
       extraDice = [] as DamageDie[],
+      attackModOptions = {} as AttackModOptions,
     } = {},
   ) {
     const attackResult = attack.rollToHit(this, {
@@ -33,6 +34,7 @@ export class Character {
       disadvantage,
       advantageDice,
       disadvantageDice,
+      attackModOptions,
     });
     // TODO: Remove these logs
     console.log(attackResult.result, JSON.stringify(attackResult.rolls));
@@ -49,7 +51,11 @@ export class Character {
   }
 }
 
-export type AttackModFormula = (c: Character) => number;
+type AttackModOptions = { isProficient: boolean };
+export type AttackModFormula = (
+  c: Character,
+  options?: AttackModOptions,
+) => number;
 export type DamageModFormula = (c: Character) => number;
 
 export type AttackRollResult = {
@@ -86,6 +92,7 @@ export class AttackAction {
       disadvantage = false,
       advantageDice = 2,
       disadvantageDice = 2,
+      attackModOptions = {} as AttackModOptions,
     } = {},
   ): AttackRollResult {
     let chosenDie;
@@ -101,7 +108,7 @@ export class AttackAction {
       chosenDie = rolls[0];
     }
 
-    const modifier = this.attackModFormula(attacker);
+    const modifier = this.attackModFormula(attacker, attackModOptions);
     return {
       result: minOne(chosenDie.result + modifier),
       rolls,
@@ -164,7 +171,8 @@ export class AttackAction {
 
 export class WeaponAttack extends AttackAction {
   static attackFormula(stat: Stat, magicBonus: number) {
-    return (c: Character) => c.mod(stat) + c.pb + magicBonus;
+    return (c: Character, { isProficient = true } = {}) =>
+      c.mod(stat) + (isProficient ? c.pb : 0) + magicBonus;
   }
 
   static damageFormula(stat: Stat, magicBonus: number) {

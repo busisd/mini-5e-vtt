@@ -1,13 +1,8 @@
-import {
-  AttackRollResult,
-  Character,
-  DamageRollResult,
-  WeaponAttack,
-} from "./classes/character";
+import { Character, WeaponAttack } from "./classes/character";
 import { DamageType } from "./classes/damageTypes";
 import { DamageDie } from "./classes/dice";
 import { Stat } from "./classes/stats";
-import { addAttackRolls, addDamageRolls } from "./components/rollDisplays";
+import { addResults } from "./components/rollDisplays";
 import { plaintextSvg, svgElement } from "./svg/diceSvg";
 
 function makeStatArray(stats: number[]) {
@@ -45,20 +40,8 @@ const lotsOfD6Attack = new WeaponAttack(Stat.STR, [
   new DamageDie(6, DamageType.SLASHING),
 ]);
 
-const zero = new Character(makeStatArray([10, 10, 10, 10, 10, 10]), 0);
-const weakling = new Character(makeStatArray([4, 6, 10, 10, 10, 10]), 0);
-
-const addResults = ({
-  attackResult,
-  damageResult,
-}: {
-  attackResult: AttackRollResult;
-  damageResult: DamageRollResult;
-}) => {
-  addAttackRolls(attackResult);
-  document.body.appendChild(document.createElement("br"));
-  addDamageRolls(damageResult.rolls);
-};
+const zero = new Character(makeStatArray([10, 10, 10, 10, 10, 10]), 2);
+const weakling = new Character(makeStatArray([4, 6, 10, 10, 10, 10]), 2);
 
 console.log(goblin, shortbow);
 
@@ -106,7 +89,9 @@ document.body.appendChild(document.createElement("br"));
 console.log("Zero:");
 document.body.appendChild(svgElement(plaintextSvg("Zero:", { width: 2000 })));
 document.body.appendChild(document.createElement("br"));
-addResults(zero.useAttack(longsword2H));
+addResults(
+  zero.useAttack(longsword2H, { attackModOptions: { isProficient: false } }),
+);
 document.body.appendChild(document.createElement("br"));
 
 console.log("Weakling:");
@@ -114,7 +99,11 @@ document.body.appendChild(
   svgElement(plaintextSvg("Weakling:", { width: 2000 })),
 );
 document.body.appendChild(document.createElement("br"));
-addResults(weakling.useAttack(longsword2H));
+addResults(
+  weakling.useAttack(longsword2H, {
+    attackModOptions: { isProficient: false },
+  }),
+);
 document.body.appendChild(document.createElement("br"));
 
 console.log("D10 damage with disadvantage:");

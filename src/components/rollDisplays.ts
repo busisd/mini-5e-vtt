@@ -1,4 +1,4 @@
-import { AttackRollResult } from "../classes/character";
+import { AttackRollResult, DamageRollResult } from "../classes/character";
 import { DieRoll } from "../classes/dice";
 import { plaintextSvg, sidesToSvg, svgElement } from "../svg/diceSvg";
 
@@ -49,4 +49,17 @@ export const addDamageRolls = (rolls: DieRoll[]) => {
       svgElement(sidesToSvg(roll.sides)(String(roll.result))),
     );
   }
+};
+
+export const addResults = ({
+  attackResult,
+  damageResult,
+}: {
+  attackResult: AttackRollResult;
+  damageResult: DamageRollResult;
+}) => {
+  addAttackRolls(attackResult);
+  document.body.appendChild(document.createElement("br"));
+  addDamageRolls(damageResult.rolls);
+  document.body.appendChild(document.createElement("br"));
 };
