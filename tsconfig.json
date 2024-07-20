@@ -5,6 +5,7 @@
     "module": "ES6",
     "noImplicitAny": true,
     "allowJs": true,
+    "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

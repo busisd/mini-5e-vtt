@@ -1,0 +1,27 @@
+.tab-container {
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-bottom: solid 1px;
+}
+
+.tab {
+  min-width: 80px;
+  border: solid;
+  border-width: 1px;
+  border-bottom: 0px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+}
+
+.tab-selected {
+  background-color: darkgray;    
+}
+
+.tab-unselected {
+  background-color: lightgray;
+  cursor: pointer;
+}

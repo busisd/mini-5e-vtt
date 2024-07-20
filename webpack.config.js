@@ -4,13 +4,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   mode: "development",
   devtool: "inline-source-map",
-  entry: "./src/index.ts",
+  entry: "./src/index.tsx",
   devServer: {
     static: "./dist",
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: "Mini 5e VTT",
+      template: "./src/templates/template.ejs"
     }),
   ],
   module: {
