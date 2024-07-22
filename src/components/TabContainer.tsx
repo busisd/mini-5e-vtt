@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { TabIds } from "./App";
 import upperFirst from "lodash/upperFirst";
 import "./TabContainer.css"
 
@@ -39,13 +38,15 @@ const Tab = ({
 const TabContainer = ({
   selectedId,
   setSelectedId,
+  tabIds
 }: {
   selectedId: string;
   setSelectedId: SetState<string>;
+  tabIds: string[];
 }) => {
   return (
     <div className="tab-container">
-      {Object.values(TabIds).map((id) => (
+      {Object.values(tabIds).map((id) => (
         <Tab
           id={id}
           selectedId={selectedId}

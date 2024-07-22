@@ -1,0 +1,13 @@
+.hello {
+  color: red;
+  background: url('./resources/icon.png');
+}
+
+body {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.main-content {
+  padding: 8px;
+}

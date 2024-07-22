@@ -1,5 +1,5 @@
 .tab-container {
-  width: 100%;
+  width: calc(100% - 16px);
   padding-left: 8px;
   padding-right: 8px;
   border-bottom: solid 1px;

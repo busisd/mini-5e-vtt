@@ -10,7 +10,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: "Mini 5e VTT",
       template: "./src/templates/template.ejs"
     }),
   ],

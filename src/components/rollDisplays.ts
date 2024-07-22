@@ -1,5 +1,5 @@
-import { AttackRollResult, DamageRollResult } from "../classes/character";
-import { DieRoll } from "../classes/dice";
+import { AttackRollResult, DamageRollResult } from "../types/character";
+import { DieRoll } from "../types/dice";
 import { plaintextSvg, sidesToSvg, svgElement } from "../svg/diceSvg";
 
 const getD20RollColor = (roll: DieRoll) => {
