@@ -21,7 +21,7 @@ const TabViews = {
 }
 
 const App = () => {
-  const [selectedId, setSelectedId] = useState(Tabs.Attacks);
+  const [selectedId, setSelectedId] = useState(Tabs.DiceRoller);
 
   const MainView = useMemo(() => TabViews[selectedId], [selectedId]);
 

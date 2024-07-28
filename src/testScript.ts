@@ -3,7 +3,7 @@ import { DamageType } from "./types/damageTypes";
 import { DamageDie } from "./types/dice";
 import { Stat } from "./types/stats";
 import { addResults } from "./components/rollDisplays";
-import { plaintextSvg, svgElement } from "./svg/diceSvg";
+import { plaintextSvg, svgElement } from "./svg/diceSvgOld";
 
 function makeStatArray(stats: number[]) {
   return {
