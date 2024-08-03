@@ -3,6 +3,9 @@ import "./DiceRollerView.css";
 import random from "lodash/random";
 import uniqueId from "lodash/uniqueId";
 import DieSvg from "../svg/DieSvg";
+import { tokenizeDiceString } from "../util/rollexpression/rollExpressionTokenizer";
+import { parseTokens } from "../util/rollexpression/tokenParser";
+import { parseRollExpression } from "../util/rollexpression/rollExpressionParser";
 
 /*** Parsing logic ***/
 const diceRegex = /^[1-9]\d*d[1-9]\d*$/;
@@ -35,12 +38,19 @@ const rollDice = ({
   };
 };
 
-const parseDiceString = (damageStr: string): DiceRollDefinition => {
-  if (damageStr == null || damageStr.length === 0) {
+const parseDiceString = (diceStr: string): DiceRollDefinition => {
+  if (diceStr == null || diceStr.length === 0) {
     throw new Error("Enter an expression");
   }
 
-  const tokens = damageStr.split("+").map((token) => token.trim());
+  const tokens = diceStr.split("+").map((token) => token.trim());
+
+  const tokenizedTokens = tokenizeDiceString(diceStr);
+  console.log("tokenizedTokens", tokenizedTokens);
+  const parsedTokens = parseTokens(tokenizedTokens);
+  console.log("parsedTokens", parsedTokens);
+  const parsedExpression = parseRollExpression(parsedTokens);
+  console.log("parsedExpression", parsedExpression);
 
   const dice: number[] = [];
   const flatBonuses: number[] = [];
@@ -81,7 +91,12 @@ const DiceRollResultDisplay = ({ result }: { result: DiceRollResult }) => {
   return (
     <>
       {result.rolls.map((dieRoll, index) => (
-        <DieSvg key={index} sides={dieRoll.sides} text={dieRoll.result} />
+        <DieSvg
+          key={index}
+          sides={dieRoll.sides}
+          text={dieRoll.result}
+          color={index > 0 ? "lightgrey" : "black"}
+        />
       ))}
       <br />
     </>
@@ -93,6 +108,7 @@ const DiceRollResultDisplay = ({ result }: { result: DiceRollResult }) => {
 //  - Better tokenizer and parser, support negative modifiers and parens
 //  - More flexible definition and result types, support re-roll and drop modifiers on tokens
 //  - Store results in scrollable panel
+//  - Press Enter to submit
 
 const DiceRollerView = () => {
   const [rawInput, setRawInput] = useState("");
@@ -103,6 +119,8 @@ const DiceRollerView = () => {
     setInputError(null);
 
     try {
+      console.log(tokenizeDiceString(rawInput));
+
       const parsedInput = parseDiceString(rawInput);
       const result = rollDice(parsedInput);
       setResults((currentResults) => [result, ...currentResults]);
