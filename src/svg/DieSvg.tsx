@@ -25,6 +25,24 @@ const TextSvgTag = ({
   </text>
 );
 
+export const TextSvg = ({
+  text,
+  width = 200,
+  color = "black",
+}: {
+  text: string | number;
+  width?: number;
+  color?: string;
+}) => (
+  <svg
+    viewBox="0 0 200 200"
+    xmlns="http://www.w3.org/2000/svg"
+    className="dieSvg"
+  >
+    <TextSvgTag text={text} color={color} width={width} />
+  </svg>
+);
+
 export const D4Svg = ({
   text,
   color = "black",

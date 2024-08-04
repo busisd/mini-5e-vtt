@@ -1,11 +1,15 @@
-import { useCallback, useState } from "react";
-import "./DiceRollerView.css";
 import random from "lodash/random";
 import uniqueId from "lodash/uniqueId";
-import DieSvg from "../svg/DieSvg";
+import React, { useCallback, useState } from "react";
+import DieSvg, { TextSvg } from "../svg/DieSvg";
+import {
+  DiceExpressionResult,
+  evaluateDiceExpression,
+  EvaluatedResultEntry,
+} from "../util/rollexpression/rollExpressionEvaluator";
 import { tokenizeDiceString } from "../util/rollexpression/rollExpressionTokenizer";
-import { parseTokens } from "../util/rollexpression/tokenParser";
-import { parseRollExpression } from "../util/rollexpression/rollExpressionParser";
+import "./DiceRollerView.css";
+import { OperatorType } from "../util/rollexpression/rollExpressionParser";
 
 /*** Parsing logic ***/
 const diceRegex = /^[1-9]\d*d[1-9]\d*$/;
@@ -45,12 +49,14 @@ const parseDiceString = (diceStr: string): DiceRollDefinition => {
 
   const tokens = diceStr.split("+").map((token) => token.trim());
 
-  const tokenizedTokens = tokenizeDiceString(diceStr);
-  console.log("tokenizedTokens", tokenizedTokens);
-  const parsedTokens = parseTokens(tokenizedTokens);
-  console.log("parsedTokens", parsedTokens);
-  const parsedExpression = parseRollExpression(parsedTokens);
-  console.log("parsedExpression", parsedExpression);
+  // const tokenizedTokens = tokenizeDiceString(diceStr);
+  // console.log("tokenizedTokens", tokenizedTokens);
+  // const parsedTokens = parseTokens(tokenizedTokens);
+  // console.log("parsedTokens", parsedTokens);
+  // const parsedExpression = parseRollExpression(parsedTokens);
+  // console.log("parsedExpression", parsedExpression);
+  // const evaluatedExpression = evaluateOperand(parsedExpression);
+  // console.log("evaluatedExpression", evaluatedExpression);
 
   const dice: number[] = [];
   const flatBonuses: number[] = [];
@@ -103,17 +109,91 @@ const DiceRollResultDisplay = ({ result }: { result: DiceRollResult }) => {
   );
 };
 
+const isOperatorEntry = (resultEntry: EvaluatedResultEntry) =>
+  "operator" in resultEntry;
+const isRollEntry = (resultEntry: EvaluatedResultEntry) =>
+  "dieRolls" in resultEntry;
+const isNumberEntry = (resultEntry: EvaluatedResultEntry) =>
+  "value" in resultEntry;
+
+const operatorText = (operator: OperatorType): string => {
+  switch (operator) {
+    case OperatorType.PLUS:
+      return "+";
+    case OperatorType.MINUS:
+      return "-";
+    case OperatorType.TIMES:
+      return "*";
+  }
+};
+
+const DiceExpressionResultDisplay = ({
+  result,
+}: {
+  result: DiceExpressionResult;
+}) => {
+  // TODO: Split out into individual components
+  return (
+    <>
+      {result.results.map((resultEntry, index) => {
+        if (isOperatorEntry(resultEntry)) {
+          return (
+            <TextSvg
+              text={operatorText(resultEntry.operator)}
+              key={`${resultEntry.operator}-${index}`}
+            />
+          );
+        } else if (isRollEntry(resultEntry)) {
+          return (
+            <React.Fragment key={`${resultEntry.total}-${index}`}>
+              {resultEntry.dieRolls.map((dieRoll) => (
+                <DieSvg
+                  key={dieRoll.id}
+                  sides={resultEntry.sidesPerDie}
+                  text={dieRoll.roll}
+                  color={"black"}
+                />
+              ))}
+              {resultEntry.droppedRolls.map((dieRoll) => (
+                <DieSvg
+                  key={dieRoll.id}
+                  sides={resultEntry.sidesPerDie}
+                  text={dieRoll.roll}
+                  color={"lightgrey"}
+                />
+              ))}
+            </React.Fragment>
+          );
+        } else if (isNumberEntry(resultEntry)) {
+          return (
+            <TextSvg
+              text={resultEntry.value}
+              key={`${resultEntry.value}-${index}`}
+            />
+          );
+        } else {
+          console.error("Unexpected result entry", resultEntry);
+          return undefined;
+        }
+      })}
+      Total={result.total}
+      <br />
+    </>
+  );
+};
+
 // TODO:
 //  - Store results in Redux so that they're maintained when switching tabs
-//  - Better tokenizer and parser, support negative modifiers and parens
-//  - More flexible definition and result types, support re-roll and drop modifiers on tokens
 //  - Store results in scrollable panel
 //  - Press Enter to submit
+//  - Support parens
+//  - Context reference values?
+//  - Show rerolls in tooltip or on-click in little popup
 
 const DiceRollerView = () => {
   const [rawInput, setRawInput] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
-  const [results, setResults] = useState<DiceRollResult[]>([]);
+  const [results, setResults] = useState<DiceExpressionResult[]>([]);
 
   const onSubmit = useCallback(() => {
     setInputError(null);
@@ -121,9 +201,12 @@ const DiceRollerView = () => {
     try {
       console.log(tokenizeDiceString(rawInput));
 
-      const parsedInput = parseDiceString(rawInput);
-      const result = rollDice(parsedInput);
-      setResults((currentResults) => [result, ...currentResults]);
+      // const parsedInput = parseDiceString(rawInput);
+      // const result = rollDice(parsedInput);
+
+      const evaluatedExpression = evaluateDiceExpression(rawInput);
+
+      setResults((currentResults) => [evaluatedExpression, ...currentResults]);
     } catch (e) {
       setInputError(getErrorMessage(e));
     }
@@ -140,7 +223,8 @@ const DiceRollerView = () => {
       <button onClick={onSubmit}>Roll dice</button>
       <br />
       {results.map((result) => (
-        <DiceRollResultDisplay key={result.id} result={result} />
+        // <DiceRollResultDisplay key={result.id} result={result} />
+        <DiceExpressionResultDisplay key={result.id} result={result} />
       ))}
     </>
   );

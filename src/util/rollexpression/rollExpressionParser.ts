@@ -13,9 +13,10 @@ export type Operator = {
 export type RollOperand = {
   numberOfDice: number;
   sidesPerDie: number;
-  reroll?: number;
-  recursiveReroll?: number;
-  drop?: number;
+  recursiveReroll: number;
+  reroll: number;
+  pick: number;
+  drop: number;
 };
 
 export type NumberOperand = {
@@ -23,14 +24,14 @@ export type NumberOperand = {
 };
 
 type ExpressionOperand = {
-  operator: OperatorType;
+  operator: Operator;
   lhs: Operand;
   rhs: Operand;
 };
 
 export type ParsedToken = Operator | RollOperand | NumberOperand;
 
-type Operand = ExpressionOperand | RollOperand | NumberOperand;
+export type Operand = ExpressionOperand | RollOperand | NumberOperand;
 
 const OPERATOR_PRECEDENCE = {
   [OperatorType.TIMES]: 2,
@@ -56,10 +57,11 @@ export const parseRollExpression = (
 
   // Shunting yard algorithm
   while (parsedTokens.length > 0) {
-    console.log("hmm", parsedTokens, operandStack, operatorStack);
     const currentOperand = parsedTokens.shift();
     if (currentOperand == null || isOperator(currentOperand)) {
-      throw new Error(`Expected an operand, but received: ${currentOperand}`);
+      throw new Error(
+        `Expected an operand, but received: ${JSON.stringify(currentOperand)}`,
+      );
     }
     operandStack.push(currentOperand);
 
@@ -68,7 +70,9 @@ export const parseRollExpression = (
     }
     const currentOperator = parsedTokens.shift();
     if (currentOperator == null || !isOperator(currentOperator)) {
-      throw new Error(`Expected an operator, but received: ${currentOperand}`);
+      throw new Error(
+        `Expected an operator, but received: ${JSON.stringify(currentOperator)}`,
+      );
     }
 
     while (
@@ -106,11 +110,11 @@ const addExpressionOperand = (
 ) => {
   if (operatorStack.length < 1 || operandStack.length < 2) {
     throw new Error(
-      `Too few operators or operands: ${operatorStack}, ${operandStack}`,
+      `Too few operators or operands: ${JSON.stringify(operatorStack)}, ${JSON.stringify(operandStack)}`,
     );
   }
   const expressionOperand: ExpressionOperand = {
-    operator: (operatorStack.pop() as Operator).operator,
+    operator: operatorStack.pop() as Operator,
     rhs: operandStack.pop() as Operand,
     lhs: operandStack.pop() as Operand,
   };

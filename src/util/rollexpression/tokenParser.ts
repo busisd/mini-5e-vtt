@@ -8,6 +8,11 @@ import {
 const dicePrefixRegex = /^\d*d\d*/;
 const flatBonusRegex = /^\d*$/;
 
+const recursiveRerollSuffixRegex = /rr(?<val>\d+)/g;
+const rerollSuffixRegex = /r(?<val>\d+)/g;
+const pickSuffixRegex = /p(?<val>\d+)/g;
+const dropSuffixRegex = /d(?<val>\d+)/g;
+
 export const parseTokens = (tokenStrings: string[]): ParsedToken[] => {
   return tokenStrings.map(parseToken);
 };
@@ -34,7 +39,7 @@ const parseRollToken = (tokenStr: string): RollOperand => {
     throw new Error(`Could not parse token: ${tokenStr}`);
   }
   const [numberOfDiceStr, sidesPerDieStr] = dicePrefixStr.split("d");
-  const diceSuffixStr = tokenStr.substring(dicePrefixStr.length);
+  let diceSuffixStr = tokenStr.substring(dicePrefixStr.length);
 
   const numberOfDice = parseInt(numberOfDiceStr);
   const sidesPerDie = parseInt(sidesPerDieStr);
@@ -48,15 +53,82 @@ const parseRollToken = (tokenStr: string): RollOperand => {
     );
   }
 
-  // TODO: Support dice suffix operations
-  // TODO: Guardrails on allowed values
-  if (diceSuffixStr === "TODO") {
-    console.log("TODO");
+  const {
+    newSuffixStr: newSuffixStrRecursiveReroll,
+    tokenVal: recursiveReroll,
+  } = parseSuffixValue(recursiveRerollSuffixRegex, diceSuffixStr);
+  diceSuffixStr = newSuffixStrRecursiveReroll;
+  const { newSuffixStr: newSuffixStrReroll, tokenVal: reroll } =
+    parseSuffixValue(rerollSuffixRegex, diceSuffixStr);
+  diceSuffixStr = newSuffixStrReroll;
+  const { newSuffixStr: newSuffixStrPick, tokenVal: pick } = parseSuffixValue(
+    pickSuffixRegex,
+    diceSuffixStr,
+  );
+  diceSuffixStr = newSuffixStrPick;
+  const { newSuffixStr: newSuffixStrDrop, tokenVal: drop } = parseSuffixValue(
+    dropSuffixRegex,
+    diceSuffixStr,
+  );
+  diceSuffixStr = newSuffixStrDrop;
+
+  if (diceSuffixStr.length > 0) {
+    throw new Error(
+      `Unrecognized suffix ${diceSuffixStr} in token ${tokenStr}`,
+    );
+  }
+
+  if (recursiveReroll != null && recursiveReroll >= sidesPerDie) {
+    throw new Error(
+      `Token ${tokenStr} tries to recursively reroll a number >= than the sides per die`,
+    );
+  }
+  if (reroll != null && reroll >= sidesPerDie) {
+    throw new Error(
+      `Token ${tokenStr} tries to reroll a number >= than the sides per die`,
+    );
+  }
+  if (pick != null && pick > numberOfDice) {
+    throw new Error(`Token ${tokenStr} tries to pick more dice than rolled`);
+  }
+  if (drop != null && drop > numberOfDice) {
+    throw new Error(`Token ${tokenStr} tries to drop more dice than rolled`);
+  }
+  if (pick != null && drop != null && pick + drop > numberOfDice) {
+    throw new Error(
+      `Token ${tokenStr} tries to pick and drop more dice than rolled`,
+    );
   }
 
   return {
     numberOfDice,
     sidesPerDie,
+    recursiveReroll: recursiveReroll ?? 0,
+    reroll: reroll ?? 0,
+    pick: pick ?? Infinity,
+    drop: drop ?? 0,
+  };
+};
+
+const parseSuffixValue = (regex: RegExp, suffixStr: string) => {
+  const recursiveRerollMatches = [...suffixStr.matchAll(regex)];
+  if (recursiveRerollMatches.length === 0)
+    return { newSuffixStr: suffixStr, tokenVal: undefined };
+  if (recursiveRerollMatches.length > 1) {
+    throw new Error(
+      `Token suffix ${suffixStr} has duplicate suffix operations`,
+    );
+  }
+
+  const fullToken = recursiveRerollMatches[0][0];
+  const tokenVal = parseInt(recursiveRerollMatches[0].groups?.val ?? "");
+  if (isNaN(tokenVal)) {
+    throw new Error(`Cannot parse value from suffix ${suffixStr}`);
+  }
+
+  return {
+    newSuffixStr: suffixStr.replace(fullToken, ""),
+    tokenVal,
   };
 };
 
