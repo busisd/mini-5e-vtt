@@ -1,4 +1,5 @@
 import minBy from "lodash/minBy";
+import maxBy from "lodash/maxBy";
 import { randInt } from "../util";
 import {
   Operand,
@@ -117,6 +118,9 @@ const evaluateRollOperand = (operand: RollOperand): DiceRollResult => {
   for (let dropIndex = 0; dropIndex < operand.drop; dropIndex++) {
     dropLowestDie(dieRolls, droppedRolls);
   }
+  while (dieRolls.length > operand.pickLowest) {
+    dropHighestDie(dieRolls, droppedRolls);
+  }
   while (dieRolls.length > operand.pick) {
     dropLowestDie(dieRolls, droppedRolls);
   }
@@ -146,6 +150,16 @@ const dropLowestDie = (
   droppedRolls.push(lowestRoll);
 };
 
+const dropHighestDie = (
+  dieRolls: SingleDieRollResult[],
+  droppedRolls: SingleDieRollResult[],
+) => {
+  const highestRoll = maxBy(dieRolls, "roll") as SingleDieRollResult;
+  const highestRollIndex = dieRolls.indexOf(highestRoll);
+  dieRolls.splice(highestRollIndex, 1);
+  droppedRolls.push(highestRoll);
+};
+
 const operate = (operator: OperatorType, lhs: number, rhs: number) => {
   switch (operator) {
     case OperatorType.PLUS:
@@ -154,6 +168,8 @@ const operate = (operator: OperatorType, lhs: number, rhs: number) => {
       return lhs - rhs;
     case OperatorType.TIMES:
       return lhs * rhs;
+    case OperatorType.DIVIDE:
+      return Math.ceil(lhs / rhs);
   }
 };
 

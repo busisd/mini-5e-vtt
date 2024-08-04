@@ -10,6 +10,7 @@ const flatBonusRegex = /^\d*$/;
 
 const recursiveRerollSuffixRegex = /rr(?<val>\d+)/g;
 const rerollSuffixRegex = /r(?<val>\d+)/g;
+const pickLowestSuffixRegex = /pl(?<val>\d+)/g;
 const pickSuffixRegex = /p(?<val>\d+)/g;
 const dropSuffixRegex = /d(?<val>\d+)/g;
 
@@ -24,6 +25,8 @@ export const parseToken = (tokenStr: string): ParsedToken => {
     return { operator: OperatorType.MINUS };
   } else if (tokenStr === "*") {
     return { operator: OperatorType.TIMES };
+  } else if (tokenStr === "/") {
+    return { operator: OperatorType.DIVIDE };
   } else if (dicePrefixRegex.test(tokenStr)) {
     return parseRollToken(tokenStr);
   } else if (flatBonusRegex.test(tokenStr)) {
@@ -61,6 +64,9 @@ const parseRollToken = (tokenStr: string): RollOperand => {
   const { newSuffixStr: newSuffixStrReroll, tokenVal: reroll } =
     parseSuffixValue(rerollSuffixRegex, diceSuffixStr);
   diceSuffixStr = newSuffixStrReroll;
+  const { newSuffixStr: newSuffixStrPickLowest, tokenVal: pickLowest } =
+    parseSuffixValue(pickLowestSuffixRegex, diceSuffixStr);
+  diceSuffixStr = newSuffixStrPickLowest;
   const { newSuffixStr: newSuffixStrPick, tokenVal: pick } = parseSuffixValue(
     pickSuffixRegex,
     diceSuffixStr,
@@ -78,6 +84,14 @@ const parseRollToken = (tokenStr: string): RollOperand => {
     );
   }
 
+  for (const val of [recursiveReroll, reroll, pick, pickLowest, drop]) {
+    if (val != null && val < 1) {
+      throw new Error(
+        `Token ${tokenStr} contains suffix with non-positive number: ${val}`,
+      );
+    }
+  }
+
   if (recursiveReroll != null && recursiveReroll >= sidesPerDie) {
     throw new Error(
       `Token ${tokenStr} tries to recursively reroll a number >= than the sides per die`,
@@ -88,13 +102,21 @@ const parseRollToken = (tokenStr: string): RollOperand => {
       `Token ${tokenStr} tries to reroll a number >= than the sides per die`,
     );
   }
+
+  if (pick != null && pickLowest != null) {
+    throw new Error(`Token ${tokenStr} tries to pick both highest and lowest`);
+  }
+  if (pickLowest != null && pickLowest > numberOfDice) {
+    throw new Error(`Token ${tokenStr} tries to pick more dice than rolled`);
+  }
   if (pick != null && pick > numberOfDice) {
     throw new Error(`Token ${tokenStr} tries to pick more dice than rolled`);
   }
+
   if (drop != null && drop > numberOfDice) {
     throw new Error(`Token ${tokenStr} tries to drop more dice than rolled`);
   }
-  if (pick != null && drop != null && pick + drop > numberOfDice) {
+  if ((pick ?? 0) + (drop ?? 0) > numberOfDice) {
     throw new Error(
       `Token ${tokenStr} tries to pick and drop more dice than rolled`,
     );
@@ -106,6 +128,7 @@ const parseRollToken = (tokenStr: string): RollOperand => {
     recursiveReroll: recursiveReroll ?? 0,
     reroll: reroll ?? 0,
     pick: pick ?? Infinity,
+    pickLowest: pickLowest ?? Infinity,
     drop: drop ?? 0,
   };
 };

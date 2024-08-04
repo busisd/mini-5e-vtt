@@ -4,6 +4,7 @@ export enum OperatorType {
   PLUS = "PLUS",
   MINUS = "MINUS",
   TIMES = "TIMES",
+  DIVIDE = "DIVIDE",
 }
 
 export type Operator = {
@@ -15,6 +16,7 @@ export type RollOperand = {
   sidesPerDie: number;
   recursiveReroll: number;
   reroll: number;
+  pickLowest: number;
   pick: number;
   drop: number;
 };
@@ -35,6 +37,7 @@ export type Operand = ExpressionOperand | RollOperand | NumberOperand;
 
 const OPERATOR_PRECEDENCE = {
   [OperatorType.TIMES]: 2,
+  [OperatorType.DIVIDE]: 2,
   [OperatorType.PLUS]: 1,
   [OperatorType.MINUS]: 1,
 };

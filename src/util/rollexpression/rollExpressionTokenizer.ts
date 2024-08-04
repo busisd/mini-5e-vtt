@@ -1,5 +1,5 @@
 const whitespaceRegex = /\s/;
-const operators = new Set(["+", "-", "*"]);
+const operators = new Set(["+", "-", "*", "/"]);
 
 class DiceStringIterator {
   #position: number;

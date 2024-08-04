@@ -26,6 +26,8 @@ const operatorText = (operator: OperatorType): string => {
       return "-";
     case OperatorType.TIMES:
       return "*";
+    case OperatorType.DIVIDE:
+      return "/";
   }
 };
 
@@ -91,6 +93,8 @@ const DiceExpressionResultDisplay = ({
 //  - Support parens
 //  - Context reference values?
 //  - Show rerolls in tooltip or on-click in little popup
+//  - Bulk roll + histogram
+//  - Fix svg widths for text - all dice in one svg?
 
 const DiceRollerView = () => {
   const [rawInput, setRawInput] = useState("");
