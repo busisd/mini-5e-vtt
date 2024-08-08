@@ -80,8 +80,9 @@ const DiceExpressionResultDisplay = ({
           return undefined;
         }
       })}
-      Total={result.total}
       <br />
+      <TextSvg text={`Total: ${result.total}`} height={60} />
+      <hr />
     </>
   );
 };
@@ -94,7 +95,6 @@ const DiceExpressionResultDisplay = ({
 //  - Context reference values?
 //  - Show rerolls in tooltip or on-click in little popup
 //  - Bulk roll + histogram
-//  - Fix svg widths for text - all dice in one svg?
 
 const DiceRollerView = () => {
   const [rawInput, setRawInput] = useState("");
@@ -125,7 +125,6 @@ const DiceRollerView = () => {
       <button onClick={() => setResults([])}>Clear</button>
       <br />
       {results.map((result) => (
-        // <DiceRollResultDisplay key={result.id} result={result} />
         <DiceExpressionResultDisplay key={result.id} result={result} />
       ))}
     </>

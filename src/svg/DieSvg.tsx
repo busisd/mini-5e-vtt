@@ -2,11 +2,13 @@ import "./DieSvg.css";
 
 const TextSvgTag = ({
   text,
-  width = 200,
+  width = 100,
+  height = 100,
   color = "black",
 }: {
   text: string | number;
   width?: number;
+  height?: number;
   color?: string;
 }) => (
   <text
@@ -15,8 +17,8 @@ const TextSvgTag = ({
     dominantBaseline="middle"
     fontFamily="monospace"
     fontWeight="bold"
-    x={`${width / 2}`}
-    y="100"
+    x={width}
+    y={height}
     fill={color}
     stroke={color}
     strokeWidth="1"
@@ -25,21 +27,26 @@ const TextSvgTag = ({
   </text>
 );
 
+const MONOSPACE_CHAR_WIDTH = 16.5;
+const TEXT_SVG_PADDING = 10;
+
 export const TextSvg = ({
   text,
-  width = 200,
+  width = text.toString().length * MONOSPACE_CHAR_WIDTH + TEXT_SVG_PADDING,
+  height = 100,
   color = "black",
 }: {
   text: string | number;
   width?: number;
+  height?: number;
   color?: string;
 }) => (
   <svg
-    viewBox="0 0 200 200"
+    viewBox={`0 0 ${width * 2} ${height * 2}`}
     xmlns="http://www.w3.org/2000/svg"
-    className="dieSvg"
+    style={{ height }}
   >
-    <TextSvgTag text={text} color={color} width={width} />
+    <TextSvgTag text={text} color={color} width={width} height={height} />
   </svg>
 );
 

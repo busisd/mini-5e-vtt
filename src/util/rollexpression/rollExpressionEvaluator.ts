@@ -177,6 +177,9 @@ export const evaluateDiceExpression = (
   diceExpression: string,
 ): DiceExpressionResult => {
   const tokenizedExpression = tokenizeDiceString(diceExpression);
+  if (tokenizedExpression.length === 0) {
+    throw new Error("Received empty expression");
+  }
   const parsedTokensExpression = parseTokens(tokenizedExpression);
   const parsedExpression = parseRollExpression(parsedTokensExpression);
   return evaluateParsedExpression(parsedExpression);

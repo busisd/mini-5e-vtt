@@ -53,6 +53,10 @@ const isOperator = (parsedToken: ParsedToken) => {
 export const parseRollExpression = (
   parsedTokensOriginal: ParsedToken[],
 ): Operand => {
+  if (parsedTokensOriginal.length === 0) {
+    throw new Error("Received empty list of tokens");
+  }
+
   const parsedTokens = [...parsedTokensOriginal];
 
   const operandStack: Operand[] = [];
@@ -91,7 +95,7 @@ export const parseRollExpression = (
     addExpressionOperand(operandStack, operatorStack);
   }
 
-  if (operandStack.length !== 1) {
+  if (operandStack.length > 1) {
     throw new Error(
       `Ended up with multiple operands: ${JSON.stringify(operandStack)}`,
     );
