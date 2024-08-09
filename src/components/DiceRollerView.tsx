@@ -7,6 +7,7 @@ import {
 } from "../util/rollexpression/rollExpressionEvaluator";
 import { OperatorType } from "../util/rollexpression/rollExpressionParser";
 import "./DiceRollerView.css";
+import { Field, Form, Formik } from "formik";
 
 const getErrorMessage = (e: unknown) =>
   (e as Error)?.message ?? "Unknown error";
@@ -113,40 +114,48 @@ const DiceExpressionResultDisplay = ({
 // TODO:
 //  - Store results in Redux so that they're maintained when switching tabs
 //  - Store results in scrollable panel
-//  - Press Enter to submit
 //  - Support parens
 //  - Context reference values?
 //  - Show rerolls in tooltip or on-click in little popup
 //  - Bulk roll + histogram
 
 const DiceRollerView = () => {
-  const [rawInput, setRawInput] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
   const [results, setResults] = useState<DiceExpressionResult[]>([]);
 
-  const onSubmit = useCallback(() => {
-    setInputError(null);
+  const onSubmit = useCallback(
+    ({ diceRollExpression }: { diceRollExpression: string }) => {
+      setInputError(null);
 
-    try {
-      const evaluatedExpression = evaluateDiceExpression(rawInput);
+      try {
+        const evaluatedExpression = evaluateDiceExpression(diceRollExpression);
 
-      setResults((currentResults) => [evaluatedExpression, ...currentResults]);
-    } catch (e) {
-      setInputError(getErrorMessage(e));
-    }
-  }, [rawInput]);
+        setResults((currentResults) => [
+          evaluatedExpression,
+          ...currentResults,
+        ]);
+      } catch (e) {
+        setInputError(getErrorMessage(e));
+      }
+    },
+    [],
+  );
 
   return (
     <>
-      <input
-        placeholder="Example: 1d8 + 2"
-        onBlur={(e) => setRawInput(e.target.value)}
-      />{" "}
-      {inputError && <span className="input-error"> {inputError} </span>}
-      <br />
-      <button onClick={onSubmit}>Roll dice</button>{" "}
-      <button onClick={() => setResults([])}>Clear</button>
-      <br />
+      <Formik initialValues={{ diceRollExpression: "" }} onSubmit={onSubmit}>
+        {() => (
+          <Form>
+            <Field name="diceRollExpression" placeholder="Example: 1d8 + 2" />
+            {inputError && <span className="input-error"> {inputError} </span>}
+            <br />
+            <button type="submit">Roll dice</button>{" "}
+            <button onClick={() => setResults([])} type="button">
+              Clear
+            </button>
+          </Form>
+        )}
+      </Formik>
       {results.map((result) => (
         <DiceExpressionResultDisplay key={result.id} result={result} />
       ))}
