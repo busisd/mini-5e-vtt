@@ -31,6 +31,26 @@ const operatorText = (operator: OperatorType): string => {
   }
 };
 
+const dieRollColor = (roll: number, sidesPerDie: number) => {
+  if (roll === sidesPerDie) {
+    return "green";
+  } else if (roll === 1) {
+    return "maroon";
+  } else {
+    return "black";
+  }
+};
+
+const droppedDieRollColor = (roll: number, sidesPerDie: number) => {
+  if (roll === sidesPerDie) {
+    return "#96c996";
+  } else if (roll === 1) {
+    return "#e7b4b4";
+  } else {
+    return "lightgrey";
+  }
+};
+
 const DiceExpressionResultDisplay = ({
   result,
 }: {
@@ -55,7 +75,7 @@ const DiceExpressionResultDisplay = ({
                   key={dieRoll.id}
                   sides={resultEntry.sidesPerDie}
                   text={dieRoll.roll}
-                  color={"black"}
+                  color={dieRollColor(dieRoll.roll, resultEntry.sidesPerDie)}
                 />
               ))}
               {resultEntry.droppedRolls.map((dieRoll) => (
@@ -63,7 +83,10 @@ const DiceExpressionResultDisplay = ({
                   key={dieRoll.id}
                   sides={resultEntry.sidesPerDie}
                   text={dieRoll.roll}
-                  color={"lightgrey"}
+                  color={droppedDieRollColor(
+                    dieRoll.roll,
+                    resultEntry.sidesPerDie,
+                  )}
                 />
               ))}
             </React.Fragment>
