@@ -5,6 +5,8 @@ import {
   Operand,
   Operator,
   OperatorType,
+  Paren,
+  ParenType,
   parseRollExpression,
   RollOperand,
 } from "./rollExpressionParser";
@@ -33,7 +35,11 @@ export type NumberResult = {
   value: number;
 };
 
-export type EvaluatedResultEntry = Operator | DiceRollResult | NumberResult;
+export type EvaluatedResultEntry =
+  | Operator
+  | Paren
+  | DiceRollResult
+  | NumberResult;
 
 type DiceExpressionRecursiveResult = {
   results: EvaluatedResultEntry[];
@@ -51,13 +57,25 @@ export const evaluateParsedExpression = (operand: Operand) => {
   };
 };
 
+const parenWrap = (
+  entry: EvaluatedResultEntry[],
+  parenWrapped: boolean | undefined,
+) => {
+  return parenWrapped
+    ? [{ paren: ParenType.L }, ...entry, { paren: ParenType.R }]
+    : entry;
+};
+
 const evaluateOperand = (operand: Operand): DiceExpressionRecursiveResult => {
   if (isExpressionOperand(operand)) {
     const lhsResult = evaluateOperand(operand.lhs);
-    const operatorResult = [operand.operator];
+    const operatorResult = operand.operator;
     const rhsResult = evaluateOperand(operand.rhs);
     return {
-      results: lhsResult.results.concat(operatorResult, rhsResult.results),
+      results: parenWrap(
+        lhsResult.results.concat(operatorResult, rhsResult.results),
+        operand.parenWrapped,
+      ),
       total: operate(
         operand.operator.operator,
         lhsResult.total,
@@ -67,16 +85,19 @@ const evaluateOperand = (operand: Operand): DiceExpressionRecursiveResult => {
   } else if (isRollOperand(operand)) {
     const rollOperandResult = evaluateRollOperand(operand);
     return {
-      results: [rollOperandResult],
+      results: parenWrap([rollOperandResult], operand.parenWrapped),
       total: rollOperandResult.total,
     };
   } else if (isNumberOperand(operand)) {
     return {
-      results: [
-        {
-          value: operand.value,
-        },
-      ],
+      results: parenWrap(
+        [
+          {
+            value: operand.value,
+          },
+        ],
+        operand.parenWrapped,
+      ),
       total: operand.value,
     };
   } else {

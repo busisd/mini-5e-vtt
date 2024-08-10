@@ -372,6 +372,37 @@ export const CircleSvg = ({
   </svg>
 );
 
+export const InfoIconSvg = () => (
+  <>
+    <circle
+      strokeWidth="5"
+      cx="170"
+      cy="170"
+      r="25"
+      stroke="black"
+      fillOpacity="1"
+      fill="white"
+      onClick={() => console.log("rolls")}
+      style={{ cursor: "pointer" }}
+    />
+    <text
+      fontSize="40"
+      textAnchor="middle"
+      dominantBaseline="middle"
+      fontFamily="monospace"
+      x="170"
+      y="170"
+      fill="black"
+      stroke="black"
+      strokeWidth="1"
+      onClick={() => console.log("rolls")}
+      style={{ cursor: "pointer" }}
+    >
+      i
+    </text>
+  </>
+);
+
 export const DieSvg = ({
   sides,
   text,

@@ -1,6 +1,7 @@
 import {
   NumberOperand,
   OperatorType,
+  ParenType,
   ParsedToken,
   RollOperand,
 } from "./rollExpressionParser";
@@ -27,6 +28,10 @@ export const parseToken = (tokenStr: string): ParsedToken => {
     return { operator: OperatorType.TIMES };
   } else if (tokenStr === "/") {
     return { operator: OperatorType.DIVIDE };
+  } else if (tokenStr === "(") {
+    return { paren: ParenType.L };
+  } else if (tokenStr === ")") {
+    return { paren: ParenType.R };
   } else if (dicePrefixRegex.test(tokenStr)) {
     return parseRollToken(tokenStr);
   } else if (flatBonusRegex.test(tokenStr)) {

@@ -11,6 +11,18 @@ export type Operator = {
   operator: OperatorType;
 };
 
+export enum ParenType {
+  L = "L",
+  R = "R",
+}
+
+export type Paren = {
+  paren: ParenType;
+};
+
+export const L_PAREN = "L_PAREN";
+export const R_PAREN = "R_PAREN";
+
 export type RollOperand = {
   numberOfDice: number;
   sidesPerDie: number;
@@ -19,19 +31,22 @@ export type RollOperand = {
   pickLowest: number;
   pick: number;
   drop: number;
+  parenWrapped?: boolean;
 };
 
 export type NumberOperand = {
   value: number;
+  parenWrapped?: boolean;
 };
 
 type ExpressionOperand = {
   operator: Operator;
   lhs: Operand;
   rhs: Operand;
+  parenWrapped?: boolean;
 };
 
-export type ParsedToken = Operator | RollOperand | NumberOperand;
+export type ParsedToken = Operator | Paren | RollOperand | NumberOperand;
 
 export type Operand = ExpressionOperand | RollOperand | NumberOperand;
 
@@ -50,6 +65,25 @@ const isOperator = (parsedToken: ParsedToken) => {
   return "operator" in parsedToken;
 };
 
+const isParen = (
+  parsedToken: ParsedToken | undefined,
+): parsedToken is Paren => {
+  if (parsedToken == null) return false;
+  return "paren" in parsedToken;
+};
+
+const isLParen = (
+  parsedToken: ParsedToken | undefined,
+): parsedToken is Paren => {
+  return isParen(parsedToken) && parsedToken.paren === ParenType.L;
+};
+
+const isRParen = (
+  parsedToken: ParsedToken | undefined,
+): parsedToken is Paren => {
+  return isParen(parsedToken) && parsedToken.paren === ParenType.R;
+};
+
 export const parseRollExpression = (
   parsedTokensOriginal: ParsedToken[],
 ): Operand => {
@@ -60,23 +94,46 @@ export const parseRollExpression = (
   const parsedTokens = [...parsedTokensOriginal];
 
   const operandStack: Operand[] = [];
-  const operatorStack: Operator[] = [];
+  const operatorStack: (Operator | Paren)[] = [];
 
   // Shunting yard algorithm
   while (parsedTokens.length > 0) {
-    const currentOperand = parsedTokens.shift();
-    if (currentOperand == null || isOperator(currentOperand)) {
+    let currentOperand = parsedTokens.shift();
+    while (isLParen(currentOperand)) {
+      operatorStack.push(currentOperand);
+      currentOperand = parsedTokens.shift();
+    }
+    if (
+      currentOperand == null ||
+      isOperator(currentOperand) ||
+      isParen(currentOperand)
+    ) {
       throw new Error(
         `Expected an operand, but received: ${JSON.stringify(currentOperand)}`,
       );
     }
     operandStack.push(currentOperand);
 
-    if (parsedTokens.length === 0) {
+    let currentOperator = parsedTokens.shift();
+    while (isRParen(currentOperator)) {
+      while (!isLParen(peek(operatorStack))) {
+        if (operatorStack.length === 0) {
+          throw new Error(
+            "Found right-parenthesis without matching left-parenthesis",
+          );
+        }
+        addExpressionOperand(operandStack, operatorStack);
+      }
+
+      // Pop the LParen off the operatorStack
+      operatorStack.pop();
+      peek(operandStack).parenWrapped = true;
+      currentOperator = parsedTokens.shift();
+    }
+    if (currentOperator == null) {
       break;
     }
-    const currentOperator = parsedTokens.shift();
-    if (currentOperator == null || !isOperator(currentOperator)) {
+    if (!isOperator(currentOperator)) {
       throw new Error(
         `Expected an operator, but received: ${JSON.stringify(currentOperator)}`,
       );
@@ -84,7 +141,8 @@ export const parseRollExpression = (
 
     while (
       operatorStack.length > 0 &&
-      precedence(currentOperator) <= precedence(peek(operatorStack))
+      isOperator(peek(operatorStack)) &&
+      precedence(currentOperator) <= precedence(peek(operatorStack) as Operator)
     ) {
       addExpressionOperand(operandStack, operatorStack);
     }
@@ -113,12 +171,15 @@ export const parseRollExpression = (
  */
 const addExpressionOperand = (
   operandStack: Operand[],
-  operatorStack: Operator[],
+  operatorStack: (Operator | Paren)[],
 ) => {
   if (operatorStack.length < 1 || operandStack.length < 2) {
     throw new Error(
       `Too few operators or operands: ${JSON.stringify(operatorStack)}, ${JSON.stringify(operandStack)}`,
     );
+  }
+  if (isParen(peek(operatorStack))) {
+    throw new Error("Expected operator but received parenthesis");
   }
   const expressionOperand: ExpressionOperand = {
     operator: operatorStack.pop() as Operator,

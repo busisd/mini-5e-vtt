@@ -5,7 +5,10 @@ import {
   evaluateDiceExpression,
   EvaluatedResultEntry,
 } from "../util/rollexpression/rollExpressionEvaluator";
-import { OperatorType } from "../util/rollexpression/rollExpressionParser";
+import {
+  OperatorType,
+  ParenType,
+} from "../util/rollexpression/rollExpressionParser";
 import "./DiceRollerView.css";
 import { Field, Form, Formik } from "formik";
 
@@ -14,10 +17,21 @@ const getErrorMessage = (e: unknown) =>
 
 const isOperatorEntry = (resultEntry: EvaluatedResultEntry) =>
   "operator" in resultEntry;
+const isParenEntry = (resultEntry: EvaluatedResultEntry) =>
+  "paren" in resultEntry;
 const isRollEntry = (resultEntry: EvaluatedResultEntry) =>
   "dieRolls" in resultEntry;
 const isNumberEntry = (resultEntry: EvaluatedResultEntry) =>
   "value" in resultEntry;
+
+const parenText = (paren: ParenType): string => {
+  switch (paren) {
+    case ParenType.L:
+      return "(";
+    case ParenType.R:
+      return ")";
+  }
+};
 
 const operatorText = (operator: OperatorType): string => {
   switch (operator) {
@@ -61,7 +75,14 @@ const DiceExpressionResultDisplay = ({
   return (
     <>
       {result.results.map((resultEntry, index) => {
-        if (isOperatorEntry(resultEntry)) {
+        if (isParenEntry(resultEntry)) {
+          return (
+            <TextSvg
+              text={parenText(resultEntry.paren)}
+              key={`${resultEntry.paren}-${index}`}
+            />
+          );
+        } else if (isOperatorEntry(resultEntry)) {
           return (
             <TextSvg
               text={operatorText(resultEntry.operator)}
@@ -114,10 +135,10 @@ const DiceExpressionResultDisplay = ({
 // TODO:
 //  - Store results in Redux so that they're maintained when switching tabs
 //  - Store results in scrollable panel
-//  - Support parens
-//  - Context reference values?
 //  - Show rerolls in tooltip or on-click in little popup
 //  - Bulk roll + histogram
+//  - Context reference values
+//  - Support parens
 
 const DiceRollerView = () => {
   const [inputError, setInputError] = useState<string | null>(null);

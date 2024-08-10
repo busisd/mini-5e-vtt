@@ -1,5 +1,5 @@
 const whitespaceRegex = /\s/;
-const operators = new Set(["+", "-", "*", "/"]);
+const lengthOneTokens = new Set(["+", "-", "*", "/", "(", ")"]);
 
 class DiceStringIterator {
   #position: number;
@@ -33,8 +33,8 @@ class DiceStringIterator {
 
     let currentChar = this.#currentChar();
 
-    // If it's a length-1 operator, return immediately
-    if (operators.has(currentChar)) {
+    // If it's a length-1 token, return immediately
+    if (lengthOneTokens.has(currentChar)) {
       this.#position++;
       return currentChar;
     }
@@ -45,7 +45,7 @@ class DiceStringIterator {
       currentChar = this.#nextChar();
     } while (
       !whitespaceRegex.test(currentChar) &&
-      !operators.has(currentChar) &&
+      !lengthOneTokens.has(currentChar) &&
       this.hasNext()
     );
 
