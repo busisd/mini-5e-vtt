@@ -17,6 +17,7 @@ import uniqueId from "lodash/uniqueId";
 const isExpressionOperand = (operand: Operand) => "operator" in operand;
 const isRollOperand = (operand: Operand) => "numberOfDice" in operand;
 const isNumberOperand = (operand: Operand) => "value" in operand;
+const isContextOperand = (operand: Operand) => "key" in operand;
 
 export type DiceRollResult = {
   dieRolls: SingleDieRollResult[];
@@ -50,9 +51,12 @@ export type DiceExpressionResult = DiceExpressionRecursiveResult & {
   id: string;
 };
 
-export const evaluateParsedExpression = (operand: Operand) => {
+export const evaluateParsedExpression = (
+  operand: Operand,
+  context: { [key: string]: number } = {},
+) => {
   return {
-    ...evaluateOperand(operand),
+    ...evaluateOperand(operand, context),
     id: uniqueId("diceExpressionResult"),
   };
 };
@@ -66,7 +70,10 @@ const parenWrap = (
     : entry;
 };
 
-const evaluateOperand = (operand: Operand): DiceExpressionRecursiveResult => {
+const evaluateOperand = (
+  operand: Operand,
+  context: { [key: string]: number } = {},
+): DiceExpressionRecursiveResult => {
   if (isExpressionOperand(operand)) {
     const lhsResult = evaluateOperand(operand.lhs);
     const operatorResult = operand.operator;
@@ -90,15 +97,17 @@ const evaluateOperand = (operand: Operand): DiceExpressionRecursiveResult => {
     };
   } else if (isNumberOperand(operand)) {
     return {
-      results: parenWrap(
-        [
-          {
-            value: operand.value,
-          },
-        ],
-        operand.parenWrapped,
-      ),
+      results: parenWrap([{ value: operand.value }], operand.parenWrapped),
       total: operand.value,
+    };
+  } else if (isContextOperand(operand)) {
+    const contextValue = context[operand.key];
+    if (contextValue == null) {
+      throw new Error(`Unrecognized context value: ${operand.key}`);
+    }
+    return {
+      results: parenWrap([{ value: contextValue }], operand.parenWrapped),
+      total: contextValue,
     };
   } else {
     throw new Error(`Unrecognized operand: ${operand}`);
@@ -196,6 +205,7 @@ const operate = (operator: OperatorType, lhs: number, rhs: number) => {
 
 export const evaluateDiceExpression = (
   diceExpression: string,
+  context: { [key: string]: number } = {},
 ): DiceExpressionResult => {
   const tokenizedExpression = tokenizeDiceString(diceExpression);
   if (tokenizedExpression.length === 0) {
@@ -203,5 +213,5 @@ export const evaluateDiceExpression = (
   }
   const parsedTokensExpression = parseTokens(tokenizedExpression);
   const parsedExpression = parseRollExpression(parsedTokensExpression);
-  return evaluateParsedExpression(parsedExpression);
+  return evaluateParsedExpression(parsedExpression, context);
 };

@@ -137,8 +137,6 @@ const DiceExpressionResultDisplay = ({
 //  - Store results in scrollable panel
 //  - Show rerolls in tooltip or on-click in little popup
 //  - Bulk roll + histogram
-//  - Context reference values
-//  - Support parens
 
 const DiceRollerView = () => {
   const [inputError, setInputError] = useState<string | null>(null);

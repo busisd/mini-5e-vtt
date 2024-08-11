@@ -23,6 +23,11 @@ export type Paren = {
 export const L_PAREN = "L_PAREN";
 export const R_PAREN = "R_PAREN";
 
+export type ContextOperand = {
+  key: string;
+  parenWrapped?: boolean;
+};
+
 export type RollOperand = {
   numberOfDice: number;
   sidesPerDie: number;
@@ -46,9 +51,18 @@ type ExpressionOperand = {
   parenWrapped?: boolean;
 };
 
-export type ParsedToken = Operator | Paren | RollOperand | NumberOperand;
+export type ParsedToken =
+  | Operator
+  | Paren
+  | ContextOperand
+  | RollOperand
+  | NumberOperand;
 
-export type Operand = ExpressionOperand | RollOperand | NumberOperand;
+export type Operand =
+  | ExpressionOperand
+  | ContextOperand
+  | RollOperand
+  | NumberOperand;
 
 const OPERATOR_PRECEDENCE = {
   [OperatorType.TIMES]: 2,

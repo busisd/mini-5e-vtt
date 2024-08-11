@@ -1,4 +1,5 @@
 import {
+  ContextOperand,
   NumberOperand,
   OperatorType,
   ParenType,
@@ -6,7 +7,8 @@ import {
   RollOperand,
 } from "./rollExpressionParser";
 
-const dicePrefixRegex = /^\d*d\d*/;
+const dicePrefixRegex = /^\d*d\d+/;
+const contextPrefix = "$.";
 const flatBonusRegex = /^\d*$/;
 
 const recursiveRerollSuffixRegex = /rr(?<val>\d+)/g;
@@ -34,6 +36,8 @@ export const parseToken = (tokenStr: string): ParsedToken => {
     return { paren: ParenType.R };
   } else if (dicePrefixRegex.test(tokenStr)) {
     return parseRollToken(tokenStr);
+  } else if (tokenStr.startsWith(contextPrefix)) {
+    return parseContextToken(tokenStr);
   } else if (flatBonusRegex.test(tokenStr)) {
     return parseNumberToken(tokenStr);
   }
@@ -49,7 +53,8 @@ const parseRollToken = (tokenStr: string): RollOperand => {
   const [numberOfDiceStr, sidesPerDieStr] = dicePrefixStr.split("d");
   let diceSuffixStr = tokenStr.substring(dicePrefixStr.length);
 
-  const numberOfDice = parseInt(numberOfDiceStr);
+  // Default to 1 die
+  const numberOfDice = numberOfDiceStr === "" ? 1 : parseInt(numberOfDiceStr);
   const sidesPerDie = parseInt(sidesPerDieStr);
 
   if (isNaN(numberOfDice) || isNaN(sidesPerDie)) {
@@ -158,6 +163,12 @@ const parseSuffixValue = (regex: RegExp, suffixStr: string) => {
     newSuffixStr: suffixStr.replace(fullToken, ""),
     tokenVal,
   };
+};
+
+const parseContextToken = (tokenStr: string): ContextOperand => {
+  const value = tokenStr.replace("$.", "");
+
+  return { key: value };
 };
 
 const parseNumberToken = (tokenStr: string): NumberOperand => {
