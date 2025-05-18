@@ -11,13 +11,21 @@ import {
 // Feats/abilities?
 // Actions, bonus actions, reactions?
 // Vision, movement?
-// Species bonuses?
+
+// Spells learned/forgotten
+
+// Species bonuses
+// Background bonuses
 
 type SkillBonusArray = {
   [key in Skill]: number;
 };
 
-type CalculatedCharacter = {
+type SaveProficiencyArray = {
+  [key in Stat]: boolean;
+};
+
+export type CalculatedCharacter = {
   totalLevel: number;
   maxHp: number;
   stats: StatArray;
@@ -25,6 +33,8 @@ type CalculatedCharacter = {
   proficiencyBonus: number;
   skillProficiencies: SkillProficiencyArray;
   skillBonuses: SkillBonusArray;
+  saveProficiencies: SaveProficiencyArray;
+  saveBonuses: StatArray;
 };
 
 type ASI = {
@@ -54,6 +64,23 @@ const generateStatModsArray = (stats: StatArray): StatArray => {
   ) as StatArray;
 };
 
+const statMod = (statValue: number) => {
+  return Math.floor((statValue - 10) / 2);
+};
+
+const generateSaveBonusArray = (
+  statMods: StatArray,
+  saveProficiencies: SaveProficiencyArray,
+  proficiencyBonus: number,
+): StatArray => {
+  return Object.fromEntries(
+    Object.values(Stat).map((stat) => [
+      stat,
+      statMods[stat] + (saveProficiencies[stat] ? proficiencyBonus : 0),
+    ]),
+  ) as StatArray;
+};
+
 type LevelBonus = {
   rolledHp: number;
   asis?: ASI[];
@@ -65,10 +92,6 @@ const addASIBonus = (stats: StatArray, asis: ASI[]): StatArray => {
     newStats[asi.stat] += asi.amount;
   }
   return newStats;
-};
-
-const statMod = (statValue: number) => {
-  return Math.floor((statValue - 10) / 2);
 };
 
 const generateCharacterAtLevel = (
@@ -106,6 +129,12 @@ const generateCharacterAtLevel = (
     skillBonuses: generateSkillBonusArray(
       targetLevelSkillProficiencies,
       targetLevelStatMods,
+      proficiencyBonus,
+    ),
+    saveProficiencies: baseSaveProficiencyArray,
+    saveBonuses: generateSaveBonusArray(
+      targetLevelStatMods,
+      baseSaveProficiencyArray,
       proficiencyBonus,
     ),
   };
@@ -152,6 +181,15 @@ const baseSkillProficiencyArray: SkillProficiencyArray = {
   [Skill.INTIMIDATION]: Proficiency.NOT_PROFICIENT,
   [Skill.PERFORMANCE]: Proficiency.NOT_PROFICIENT,
   [Skill.PERSUASION]: Proficiency.NOT_PROFICIENT,
+};
+
+const baseSaveProficiencyArray: SaveProficiencyArray = {
+  [Stat.STR]: false,
+  [Stat.DEX]: false,
+  [Stat.CON]: true,
+  [Stat.INT]: false,
+  [Stat.WIS]: false,
+  [Stat.CHA]: true,
 };
 
 // Barbarian
