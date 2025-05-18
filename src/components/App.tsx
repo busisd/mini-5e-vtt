@@ -4,7 +4,7 @@ import AttacksView from "./AttacksView";
 import CharactersView from "./CharactersView";
 import MapView from "./MapView";
 import DiceRollerView from "./DiceRollerView";
-import { CharacterBuilderView } from "./CharacterBuilderView";
+import { CharacterSheetView } from "./CharacterSheetView";
 
 export const Tabs = {
   Attacks: "attacks",
@@ -18,7 +18,7 @@ const TabIds = Object.values(Tabs);
 const TabViews = {
   [Tabs.Attacks]: AttacksView,
   [Tabs.Characters]: CharactersView,
-  [Tabs.CharacterBuilder]: CharacterBuilderView,
+  [Tabs.CharacterBuilder]: CharacterSheetView,
   [Tabs.Map]: MapView,
   [Tabs.DiceRoller]: DiceRollerView,
 };

@@ -1,6 +1,5 @@
 import {
   CalculatedCharacter,
-  exampleCalculatedCharacter,
 } from "../types/characterBuilder";
 import { Stat } from "../types/stats";
 
@@ -109,19 +108,9 @@ const StatBox = ({
   );
 };
 
-const bonusLabel = (bonus: number) =>
-  `${bonus < 0 ? "-" : "+"}${Math.abs(bonus)}`;
-
-const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => {
+const StatBoxes = ({ character }: { character: CalculatedCharacter }) => {
   return (
-    <div
-      style={{
-        width: "620px",
-        height: "800px",
-        backgroundColor: "lightgray",
-        position: "relative",
-      }}
-    >
+    <>
       <StatBox
         left={20}
         top={10}
@@ -164,61 +153,145 @@ const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => {
         bonus={bonusLabel(character.statMods[Stat.CHA])}
         score={character.stats[Stat.CHA].toString()}
       />
-      <StatBox
-        left={20}
-        top={100}
-        label="STR"
-        bonus={bonusLabel(character.saveBonuses[Stat.STR])}
-        score={"Save"}
-      />
-      <StatBox
-        left={120}
-        top={100}
-        label="DEX"
-        bonus={bonusLabel(character.saveBonuses[Stat.DEX])}
-        score={"Save"}
-      />
-      <StatBox
-        left={220}
-        top={100}
-        label="CON"
-        bonus={bonusLabel(character.saveBonuses[Stat.CON])}
-        score={"Save"}
-      />
-      <StatBox
-        left={320}
-        top={100}
-        label="INT"
-        bonus={bonusLabel(character.saveBonuses[Stat.INT])}
-        score={"Save"}
-      />
-      <StatBox
-        left={420}
-        top={100}
-        label="WIS"
-        bonus={bonusLabel(character.saveBonuses[Stat.WIS])}
-        score={"Save"}
-      />
-      <StatBox
-        left={520}
-        top={100}
-        label="CHA"
-        bonus={bonusLabel(character.saveBonuses[Stat.CHA])}
-        score={"Save"}
-      />
+    </>
+  );
+};
+
+const bonusLabel = (bonus: number) =>
+  `${bonus < 0 ? "-" : "+"}${Math.abs(bonus)}`;
+
+const SaveBox = ({
+  label,
+  bonus,
+  proficient,
+  left,
+  top,
+}: {
+  label: string;
+  bonus: string;
+  proficient: boolean;
+  left: number;
+  top: number;
+}) => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        width: "100px",
+        height: "20px",
+        left,
+        top,
+        textAlign: "left",
+      }}
+    >
+      <span
+        style={{
+          fontSize: "20px",
+          fontFamily: "monospace",
+        }}
+      >
+        {proficient ? "•" : "◦"}
+        {label}: {bonus}
+      </span>
     </div>
   );
 };
 
-export const CharacterBuilderView = () => {
+export const CharacterSheetV1 = ({ character }: { character: CalculatedCharacter }) => {
   return (
-    <>
-      <CharacterSheet character={exampleCalculatedCharacter[3]} />
-      <textarea
-        style={{ width: "620px", height: "60px" }}
-        value={JSON.stringify(exampleCalculatedCharacter, null, 2)}
-        readOnly
-      />
-    </>
+    <div
+      style={{
+        width: "620px",
+        height: "800px",
+        backgroundColor: "lightgray",
+        position: "relative",
+      }}
+    >
+      <StatBoxes character={character} />
+      <div
+        style={{
+          position: "absolute",
+          width: 160,
+          height: "22px",
+          lineHeight: "20px",
+          left: 80,
+          top: 98,
+          textAlign: "center",
+          boxSizing: "border-box",
+          border: "solid",
+          borderWidth: "2px",
+          borderColor: "black",
+          borderTopLeftRadius: "10px",
+          borderTopRightRadius: "10px",
+          borderBottomWidth: 0,
+        }}
+      >
+        <span
+          style={{
+            fontSize: "16px",
+            fontFamily: "monospace",
+            fontWeight: 700,
+          }}
+        >
+          Saving throws
+        </span>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          width: 280,
+          height: 124,
+          left: 20,
+          top: 120,
+          boxSizing: "border-box",
+          border: "solid",
+          borderWidth: 2,
+          borderRadius: 5,
+        }}
+      >
+        <SaveBox
+          label={"STR"}
+          bonus={bonusLabel(character.saveBonuses[Stat.STR])}
+          proficient={character.saveProficiencies[Stat.STR]}
+          left={10}
+          top={10}
+        />
+        <SaveBox
+          label={"DEX"}
+          bonus={bonusLabel(character.saveBonuses[Stat.DEX])}
+          proficient={character.saveProficiencies[Stat.DEX]}
+          left={10}
+          top={50}
+        />
+        <SaveBox
+          label={"CON"}
+          bonus={bonusLabel(character.saveBonuses[Stat.CON])}
+          proficient={character.saveProficiencies[Stat.CON]}
+          left={10}
+          top={90}
+        />
+        <SaveBox
+          label={"INT"}
+          bonus={bonusLabel(character.saveBonuses[Stat.INT])}
+          proficient={character.saveProficiencies[Stat.INT]}
+          left={150}
+          top={10}
+        />
+        <SaveBox
+          label={"WIS"}
+          bonus={bonusLabel(character.saveBonuses[Stat.WIS])}
+          proficient={character.saveProficiencies[Stat.WIS]}
+          left={150}
+          top={50}
+        />
+        <SaveBox
+          label={"CHA"}
+          bonus={bonusLabel(character.saveBonuses[Stat.CHA])}
+          proficient={character.saveProficiencies[Stat.CHA]}
+          left={150}
+          top={90}
+        />
+      </div>
+    </div>
   );
 };

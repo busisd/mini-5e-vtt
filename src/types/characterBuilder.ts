@@ -16,6 +16,7 @@ import {
 
 // Species bonuses
 // Background bonuses
+// Hit dice
 
 type SkillBonusArray = {
   [key in Skill]: number;
@@ -35,11 +36,6 @@ export type CalculatedCharacter = {
   skillBonuses: SkillBonusArray;
   saveProficiencies: SaveProficiencyArray;
   saveBonuses: StatArray;
-};
-
-type ASI = {
-  stat: Stat;
-  amount: number;
 };
 
 const generateSkillBonusArray = (
@@ -81,9 +77,20 @@ const generateSaveBonusArray = (
   ) as StatArray;
 };
 
+type ASI = {
+  stat: Stat;
+  amount: number;
+};
+
+type LearnedSkillProficiency = {
+  skill: Skill;
+  proficiency: Proficiency;
+};
+
 type LevelBonus = {
   rolledHp: number;
   asis?: ASI[];
+  skillProfs?: LearnedSkillProficiency[];
 };
 
 const addASIBonus = (stats: StatArray, asis: ASI[]): StatArray => {
@@ -94,13 +101,25 @@ const addASIBonus = (stats: StatArray, asis: ASI[]): StatArray => {
   return newStats;
 };
 
+const addSkillProficiencies = (
+  skillProficiencies: SkillProficiencyArray,
+  learnedSkillProficiencies: LearnedSkillProficiency[],
+): SkillProficiencyArray => {
+  const newSkillProficiencies = { ...skillProficiencies };
+  for (const learnedSkillProficiency of learnedSkillProficiencies) {
+    newSkillProficiencies[learnedSkillProficiency.skill] =
+      learnedSkillProficiency.proficiency;
+  }
+  return newSkillProficiencies;
+};
+
 const generateCharacterAtLevel = (
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
   targetLevel: number,
 ): CalculatedCharacter => {
   const levelBonusesInRange = levelBonuses.slice(0, targetLevel);
-  const targetLevelSkillProficiencies = baseSkillProficiencyArray;
+  let targetLevelSkillProficiencies = baseSkillProficiencyArray;
 
   let targetLevelStats = baseStats;
   levelBonusesInRange.forEach((levelBonus) => {
@@ -116,6 +135,13 @@ const generateCharacterAtLevel = (
       levelBonus.rolledHp + targetLevelStatMods[Stat.CON],
       1,
     );
+
+    if (levelBonus.skillProfs != null) {
+      targetLevelSkillProficiencies = addSkillProficiencies(
+        targetLevelSkillProficiencies,
+        levelBonus.skillProfs,
+      );
+    }
   });
 
   const proficiencyBonus = Math.floor(targetLevel / 4) + 2;
@@ -194,7 +220,13 @@ const baseSaveProficiencyArray: SaveProficiencyArray = {
 
 // Barbarian
 const exampleLevelBonuses: LevelBonus[] = [
-  { rolledHp: 12 },
+  {
+    rolledHp: 12,
+    skillProfs: [
+      { skill: Skill.ATHLETICS, proficiency: Proficiency.EXPERTISE },
+      { skill: Skill.INTIMIDATION, proficiency: Proficiency.PROFICIENT },
+    ],
+  },
   { rolledHp: 7 },
   { rolledHp: 7 },
   {
