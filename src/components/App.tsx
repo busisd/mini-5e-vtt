@@ -5,11 +5,13 @@ import CharactersView from "./CharactersView";
 import MapView from "./MapView";
 import DiceRollerView from "./DiceRollerView";
 import { CharacterSheetView } from "./CharacterSheetView";
+import { CharacterGeneratorView } from "./CharacterGeneratorView";
 
 export const Tabs = {
   Attacks: "attacks",
   Characters: "characters",
-  CharacterBuilder: "characterBuilder",
+  CharacterGenerator: "characterGenerator",
+  CharacterSheet: "CharacterSheet",
   Map: "map",
   DiceRoller: "dice roller",
 };
@@ -18,13 +20,14 @@ const TabIds = Object.values(Tabs);
 const TabViews = {
   [Tabs.Attacks]: AttacksView,
   [Tabs.Characters]: CharactersView,
-  [Tabs.CharacterBuilder]: CharacterSheetView,
+  [Tabs.CharacterGenerator]: CharacterGeneratorView,
+  [Tabs.CharacterSheet]: CharacterSheetView,
   [Tabs.Map]: MapView,
   [Tabs.DiceRoller]: DiceRollerView,
 };
 
 const App = () => {
-  const [selectedId, setSelectedId] = useState(Tabs.CharacterBuilder);
+  const [selectedId, setSelectedId] = useState(Tabs.CharacterGenerator);
 
   const MainView = useMemo(() => TabViews[selectedId], [selectedId]);
 

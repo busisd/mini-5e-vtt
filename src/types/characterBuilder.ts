@@ -87,7 +87,7 @@ type LearnedSkillProficiency = {
   proficiency: Proficiency;
 };
 
-type LevelBonus = {
+export type LevelBonus = {
   rolledHp: number;
   asis?: ASI[];
   skillProfs?: LearnedSkillProficiency[];
