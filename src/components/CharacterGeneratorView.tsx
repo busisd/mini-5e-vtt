@@ -1,13 +1,25 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { Stat, StatArray } from "../types/stats";
+import {
+  CharacterClass,
+  ClassHitDie,
+} from "../types/characterClasses/characterClasses";
+import { CharacterSheetView } from "./CharacterSheetView";
 import { useState } from "react";
-import { CharacterClass, ClassHitDie } from "../types/classes/classes";
+import {
+  basicFighter,
+  generateCharacterAtEachLevel,
+} from "../types/characterBuilder";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),
 );
 
-type LevelChoices = { hp: number };
+export type LevelChoices = {
+  characterClass: CharacterClass;
+  hp: number;
+  asis?: Stat[];
+};
 
 export type CharacterGeneratorFormData = {
   // Relevant to final output
@@ -20,24 +32,35 @@ export type CharacterGeneratorFormData = {
 
 const levelsInClass = (
   characterClass: CharacterClass,
-  chosenClasses: CharacterClass[],
+  chosenClasses: LevelChoices[],
 ) =>
-  chosenClasses.filter((chosenClass) => chosenClass === characterClass).length;
+  chosenClasses.filter(
+    (chosenClass) => chosenClass.characterClass === characterClass,
+  ).length;
 
-export const CharacterGeneratorView = () => {
-  const [levels, setLevels] = useState<CharacterClass[]>([]);
-
-  const { register, handleSubmit, getValues } = useForm<FieldValues>({
-    defaultValues: {
-      baseStats: { ...defaultBaseStats },
-      characterClassToAdd: CharacterClass.FIGHTER,
-      levelChoices: [],
-    },
-  });
+export const CharacterGeneratorView = ({
+  onSubmitCallback,
+}: {
+  onSubmitCallback?: (data: CharacterGeneratorFormData) => void;
+}) => {
+  const { register, handleSubmit, getValues, watch, setValue } =
+    useForm<FieldValues>({
+      defaultValues: {
+        baseStats: { ...defaultBaseStats },
+        characterClassToAdd: CharacterClass.FIGHTER,
+        levelChoices: [],
+      },
+    });
+  const addedLevels = watch("levelChoices");
 
   return (
     <>
-      <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <form
+        onSubmit={handleSubmit((data) => {
+          console.log(data);
+          onSubmitCallback?.(data as CharacterGeneratorFormData);
+        })}
+      >
         <p>
           <select {...register("characterClassToAdd")}>
             {Object.values(CharacterClass).map((characterClass) => (
@@ -50,7 +73,21 @@ export const CharacterGeneratorView = () => {
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              setLevels([...levels, getValues("characterClassToAdd")]);
+              const addedClass: CharacterClass = getValues(
+                "characterClassToAdd",
+              );
+              const totalLevels = addedLevels.length;
+
+              setValue("levelChoices", [
+                ...addedLevels,
+                {
+                  characterClass: addedClass,
+                  hp:
+                    totalLevels === 0
+                      ? ClassHitDie[addedClass]
+                      : ClassHitDie[addedClass] / 2 + 1,
+                },
+              ]);
             }}
           >
             Add level
@@ -66,37 +103,34 @@ export const CharacterGeneratorView = () => {
               style={{ float: "right" }}
               type="number"
               id={`starting-${stat}`}
-              {...register(`baseStats.${stat}`)}
+              {...register(`baseStats.${stat}`, { valueAsNumber: true })}
             />
           </div>
         ))}
-        {levels.map((characterClass, levelIndex) => {
+        {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => {
           const idPrefix = `levelChoices.${levelIndex}`;
           const hpId = `${idPrefix}.hp`;
           const chosenClassLevel = levelsInClass(
-            characterClass,
-            levels.slice(0, levelIndex + 1),
+            levelChoices.characterClass,
+            addedLevels.slice(0, levelIndex + 1),
           );
           return (
             <div key={idPrefix}>
               <b>
-                Level {levelIndex + 1} ({characterClass} {chosenClassLevel}):
+                Level {levelIndex + 1} ({levelChoices.characterClass}{" "}
+                {chosenClassLevel}):
               </b>
               <div style={{ width: 300, height: 30 }}>
                 <label style={{ float: "left" }} htmlFor={hpId}>
-                  HP for level (1d{ClassHitDie[characterClass]}):{" "}
+                  HP for level (1d{ClassHitDie[levelChoices.characterClass]}):{" "}
                 </label>
                 <input
                   style={{ float: "right" }}
                   type="number"
                   id={hpId}
                   min={1}
-                  max={ClassHitDie[characterClass]}
-                  defaultValue={(levelIndex === 0
-                    ? ClassHitDie[characterClass]
-                    : ClassHitDie[characterClass] / 2 + 1
-                  ).toString()}
-                  {...register(`${idPrefix}.hp`)}
+                  max={ClassHitDie[levelChoices.characterClass]}
+                  {...register(`${idPrefix}.hp`, { valueAsNumber: true })}
                 />
               </div>
               {chosenClassLevel % 4 === 0 && (
@@ -110,10 +144,10 @@ export const CharacterGeneratorView = () => {
                     </label>
                     <select
                       style={{ float: "right" }}
-                      {...register(`${idPrefix}.asi[0]`)}
+                      {...register(`${idPrefix}.asis[0]`)}
                     >
-                      {Object.entries(Stat).map(([key, value]) => (
-                        <option key={key} value={key}>
+                      {Object.values(Stat).map((value) => (
+                        <option key={value} value={value}>
                           {value}
                         </option>
                       ))}
@@ -128,10 +162,10 @@ export const CharacterGeneratorView = () => {
                     </label>
                     <select
                       style={{ float: "right" }}
-                      {...register(`${idPrefix}.asi[1]`)}
+                      {...register(`${idPrefix}.asis[1]`)}
                     >
-                      {Object.entries(Stat).map(([key, value]) => (
-                        <option key={key} value={key}>
+                      {Object.values(Stat).map((value) => (
+                        <option key={value} value={value}>
                           {value}
                         </option>
                       ))}
@@ -145,5 +179,34 @@ export const CharacterGeneratorView = () => {
         <input type="submit" />
       </form>
     </>
+  );
+};
+
+export const CharacterSheetAndGeneratorView = () => {
+  const [calculatedCharacter, setCalculatedCharacter] = useState(
+    basicFighter[0],
+  );
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        width: "100%",
+      }}
+    >
+      <CharacterGeneratorView
+        onSubmitCallback={(formData) => {
+          const calculatedImportedCharacter = generateCharacterAtEachLevel(
+            formData.baseStats,
+            formData.levelChoices,
+          );
+          setCalculatedCharacter(
+            calculatedImportedCharacter[calculatedImportedCharacter.length - 1],
+          );
+        }}
+      />
+      <CharacterSheetView calculatedCharacter={calculatedCharacter} />
+    </div>
   );
 };

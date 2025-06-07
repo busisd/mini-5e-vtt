@@ -199,10 +199,45 @@ const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => (
   </div>
 );
 
-export const CharacterSheetView = () => {
+export const CharacterSheetView = ({
+  calculatedCharacter = exampleCalculatedCharacter[3],
+}: {
+  calculatedCharacter?: CalculatedCharacter;
+}) => {
+  // const [calculatedCharacter, setCalculatedCharacter] = useState(
+  //   exampleCalculatedCharacter[3],
+  // );
+  // console.log('example', exampleCalculatedCharacter)
+
+  // const { register, handleSubmit } =
+  //   useForm<FieldValues>({
+  //     defaultValues: {
+  //       importedCharacter: "",
+  //     },
+  //   });
+
   return (
     <>
-      <CharacterSheet character={exampleCalculatedCharacter[3]} />
+      {/* <form
+        onSubmit={handleSubmit((data) => {
+          const parsedCharacter: CharacterGeneratorFormData = JSON.parse(
+            data.importedCharacter,
+          );
+
+          const calculatedImportedCharacter = generateCharacterAtEachLevel(
+            parsedCharacter.baseStats,
+            parsedCharacter.levelChoices,
+          );
+          console.log(calculatedImportedCharacter);
+          setCalculatedCharacter(
+            calculatedImportedCharacter[calculatedImportedCharacter.length - 1],
+          );
+        })}
+      >
+        <textarea {...register("importedCharacter")} />
+        <input type="submit" />
+      </form> */}
+      <CharacterSheet character={calculatedCharacter} />
     </>
   );
 };

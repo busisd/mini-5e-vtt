@@ -5,6 +5,8 @@ import {
   SkillProficiencyArray,
   StatsBySkill,
 } from "./skills";
+import { LevelChoices } from "../components/CharacterGeneratorView";
+import { CharacterClass } from "./characterClasses/characterClasses";
 
 // Proficiencies:
 // Tools, weapons, instruments, armor, languages?
@@ -77,26 +79,20 @@ const generateSaveBonusArray = (
   ) as StatArray;
 };
 
-type ASI = {
-  stat: Stat;
-  amount: number;
-};
-
 type LearnedSkillProficiency = {
   skill: Skill;
   proficiency: Proficiency;
 };
 
-export type LevelBonus = {
-  rolledHp: number;
-  asis?: ASI[];
+export type LevelBonus = LevelChoices & {
   skillProfs?: LearnedSkillProficiency[];
 };
 
-const addASIBonus = (stats: StatArray, asis: ASI[]): StatArray => {
+const addASIBonus = (stats: StatArray, asis: Stat[]): StatArray => {
   const newStats = { ...stats };
-  for (const asi of asis) {
-    newStats[asi.stat] += asi.amount;
+  for (const stat of asis) {
+    console.log("HMM2", newStats, stat);
+    newStats[stat] += 1;
   }
   return newStats;
 };
@@ -124,6 +120,8 @@ const generateCharacterAtLevel = (
   let targetLevelStats = baseStats;
   levelBonusesInRange.forEach((levelBonus) => {
     if (levelBonus.asis != null) {
+      console.log("!!", levelBonus.asis);
+      console.log("HMM", targetLevelStats);
       targetLevelStats = addASIBonus(targetLevelStats, levelBonus.asis);
     }
   });
@@ -131,10 +129,7 @@ const generateCharacterAtLevel = (
 
   let targetLevelHp = 0;
   levelBonusesInRange.forEach((levelBonus) => {
-    targetLevelHp += Math.max(
-      levelBonus.rolledHp + targetLevelStatMods[Stat.CON],
-      1,
-    );
+    targetLevelHp += Math.max(levelBonus.hp + targetLevelStatMods[Stat.CON], 1);
 
     if (levelBonus.skillProfs != null) {
       targetLevelSkillProficiencies = addSkillProficiencies(
@@ -166,7 +161,7 @@ const generateCharacterAtLevel = (
   };
 };
 
-const generateCharacterAtEachLevel = (
+export const generateCharacterAtEachLevel = (
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
 ) => {
@@ -179,7 +174,7 @@ const generateCharacterAtEachLevel = (
   return characterByLevel;
 };
 
-const baseStatArray: StatArray = {
+const exampleBaseStatArray: StatArray = {
   [Stat.STR]: 10,
   [Stat.DEX]: 14,
   [Stat.CON]: 18,
@@ -221,24 +216,37 @@ const baseSaveProficiencyArray: SaveProficiencyArray = {
 // Barbarian
 const exampleLevelBonuses: LevelBonus[] = [
   {
-    rolledHp: 12,
+    characterClass: CharacterClass.FIGHTER,
+    hp: 12,
     skillProfs: [
       { skill: Skill.ATHLETICS, proficiency: Proficiency.EXPERTISE },
       { skill: Skill.INTIMIDATION, proficiency: Proficiency.PROFICIENT },
     ],
   },
-  { rolledHp: 7 },
-  { rolledHp: 7 },
+  { characterClass: CharacterClass.FIGHTER, hp: 7 },
+  { characterClass: CharacterClass.FIGHTER, hp: 7 },
   {
-    rolledHp: 7,
-    asis: [
-      { stat: Stat.STR, amount: 2 },
-      { stat: Stat.CON, amount: 2 },
-    ],
+    characterClass: CharacterClass.FIGHTER,
+    hp: 7,
+    asis: [Stat.STR, Stat.CON],
   },
 ];
 
 export const exampleCalculatedCharacter = generateCharacterAtEachLevel(
-  baseStatArray,
+  exampleBaseStatArray,
   exampleLevelBonuses,
+);
+
+const basicFighterBaseStatArray: StatArray = {
+  [Stat.STR]: 10,
+  [Stat.DEX]: 10,
+  [Stat.CON]: 10,
+  [Stat.INT]: 10,
+  [Stat.WIS]: 10,
+  [Stat.CHA]: 10,
+};
+
+export const basicFighter = generateCharacterAtEachLevel(
+  basicFighterBaseStatArray,
+  [{ hp: 10, characterClass: CharacterClass.FIGHTER }],
 );

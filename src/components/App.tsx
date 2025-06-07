@@ -5,7 +5,7 @@ import CharactersView from "./CharactersView";
 import MapView from "./MapView";
 import DiceRollerView from "./DiceRollerView";
 import { CharacterSheetView } from "./CharacterSheetView";
-import { CharacterGeneratorView } from "./CharacterGeneratorView";
+import { CharacterSheetAndGeneratorView } from "./CharacterGeneratorView";
 
 export const Tabs = {
   Attacks: "attacks",
@@ -20,7 +20,7 @@ const TabIds = Object.values(Tabs);
 const TabViews = {
   [Tabs.Attacks]: AttacksView,
   [Tabs.Characters]: CharactersView,
-  [Tabs.CharacterGenerator]: CharacterGeneratorView,
+  [Tabs.CharacterGenerator]: CharacterSheetAndGeneratorView,
   [Tabs.CharacterSheet]: CharacterSheetView,
   [Tabs.Map]: MapView,
   [Tabs.DiceRoller]: DiceRollerView,
