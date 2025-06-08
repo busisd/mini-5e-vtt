@@ -1,6 +1,6 @@
 import {
+  basicFighter,
   CalculatedCharacter,
-  exampleCalculatedCharacter,
 } from "../types/characterBuilder";
 import { Proficiency, SkillsByStat } from "../types/skills";
 import { Stat } from "../types/stats";
@@ -200,7 +200,7 @@ const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => (
 );
 
 export const CharacterSheetView = ({
-  calculatedCharacter = exampleCalculatedCharacter[3],
+  calculatedCharacter = basicFighter[0],
 }: {
   calculatedCharacter?: CalculatedCharacter;
 }) => {

@@ -1,7 +1,8 @@
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm, UseFormRegister } from "react-hook-form";
 import { Stat, StatArray } from "../types/stats";
 import {
   CharacterClass,
+  CharacterClassLevels,
   ClassHitDie,
 } from "../types/characterClasses/characterClasses";
 import { CharacterSheetView } from "./CharacterSheetView";
@@ -44,7 +45,7 @@ export const CharacterGeneratorView = ({
   onSubmitCallback?: (data: CharacterGeneratorFormData) => void;
 }) => {
   const { register, handleSubmit, getValues, watch, setValue } =
-    useForm<FieldValues>({
+    useForm<CharacterGeneratorFormData>({
       defaultValues: {
         baseStats: { ...defaultBaseStats },
         characterClassToAdd: CharacterClass.FIGHTER,
@@ -94,91 +95,139 @@ export const CharacterGeneratorView = ({
           </button>
         </p>
         <b>Starting stats:</b>
-        {Object.values(Stat).map((stat) => (
-          <div key={stat} style={{ width: 300, height: 30 }}>
-            <label style={{ float: "left" }} htmlFor={`starting-${stat}`}>
-              {stat}:{" "}
-            </label>
-            <input
-              style={{ float: "right" }}
-              type="number"
-              id={`starting-${stat}`}
-              {...register(`baseStats.${stat}`, { valueAsNumber: true })}
-            />
-          </div>
+        <BaseStatsSelector register={register} />
+        {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => (
+          <LevelChoicesSelector
+            register={register}
+            levelChoices={levelChoices}
+            levelIndex={levelIndex}
+            allLevelChoices={addedLevels}
+            key={`levelChoices.${levelIndex}`}
+          />
         ))}
-        {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => {
-          const idPrefix = `levelChoices.${levelIndex}`;
-          const hpId = `${idPrefix}.hp`;
-          const chosenClassLevel = levelsInClass(
-            levelChoices.characterClass,
-            addedLevels.slice(0, levelIndex + 1),
-          );
-          return (
-            <div key={idPrefix}>
-              <b>
-                Level {levelIndex + 1} ({levelChoices.characterClass}{" "}
-                {chosenClassLevel}):
-              </b>
-              <div style={{ width: 300, height: 30 }}>
-                <label style={{ float: "left" }} htmlFor={hpId}>
-                  HP for level (1d{ClassHitDie[levelChoices.characterClass]}):{" "}
-                </label>
-                <input
-                  style={{ float: "right" }}
-                  type="number"
-                  id={hpId}
-                  min={1}
-                  max={ClassHitDie[levelChoices.characterClass]}
-                  {...register(`${idPrefix}.hp`, { valueAsNumber: true })}
-                />
-              </div>
-              {chosenClassLevel % 4 === 0 && (
-                <>
-                  <div style={{ width: 300, height: 30 }}>
-                    <label
-                      style={{ float: "left" }}
-                      htmlFor={`${idPrefix}.asi1`}
-                    >
-                      ASI 1:{" "}
-                    </label>
-                    <select
-                      style={{ float: "right" }}
-                      {...register(`${idPrefix}.asis[0]`)}
-                    >
-                      {Object.values(Stat).map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div style={{ width: 300, height: 30 }}>
-                    <label
-                      style={{ float: "left" }}
-                      htmlFor={`${idPrefix}.asi1`}
-                    >
-                      ASI 2:{" "}
-                    </label>
-                    <select
-                      style={{ float: "right" }}
-                      {...register(`${idPrefix}.asis[1]`)}
-                    >
-                      {Object.values(Stat).map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })}
         <input type="submit" />
       </form>
     </>
+  );
+};
+
+type FormSectionProps = {
+  register: UseFormRegister<CharacterGeneratorFormData>;
+};
+
+const BaseStatsSelector = ({ register }: FormSectionProps) => {
+  return Object.values(Stat).map((stat) => (
+    <div key={stat} style={{ width: 300, height: 30 }}>
+      <label style={{ float: "left" }} htmlFor={`starting-${stat}`}>
+        {stat}:{" "}
+      </label>
+      <input
+        style={{ float: "right" }}
+        type="number"
+        id={`starting-${stat}`}
+        min={1}
+        max={20}
+        {...register(`baseStats.${stat}`, { valueAsNumber: true })}
+      />
+    </div>
+  ));
+};
+
+const LevelChoicesSelector = ({
+  register,
+  levelChoices,
+  levelIndex,
+  allLevelChoices,
+}: FormSectionProps & {
+  levelChoices: LevelChoices;
+  levelIndex: number;
+  allLevelChoices: LevelChoices[];
+}) => {
+  const chosenClassLevel = levelsInClass(
+    levelChoices.characterClass,
+    allLevelChoices.slice(0, levelIndex + 1),
+  );
+
+  const miscFeatures =
+    CharacterClassLevels[levelChoices.characterClass][chosenClassLevel];
+
+  return (
+    <div>
+      <h3>
+        Level {levelIndex + 1} ({levelChoices.characterClass} {chosenClassLevel}
+        ):
+      </h3>
+      <div style={{ width: 300, height: 30 }}>
+        <label
+          style={{ float: "left" }}
+          htmlFor={`levelChoices.${levelIndex}.id`}
+        >
+          HP for level (1d{ClassHitDie[levelChoices.characterClass]}):{" "}
+        </label>
+        <input
+          style={{ float: "right" }}
+          type="number"
+          id={`levelChoices.${levelIndex}.id`}
+          min={1}
+          max={ClassHitDie[levelChoices.characterClass]}
+          {...register(`levelChoices.${levelIndex}.hp`, {
+            valueAsNumber: true,
+          })}
+        />
+      </div>
+      {chosenClassLevel % 4 === 0 && (
+        <>
+          <div style={{ width: 300, height: 30 }}>
+            <label
+              style={{ float: "left" }}
+              htmlFor={`levelChoices.${levelIndex}.asi1`}
+            >
+              ASI 1:{" "}
+            </label>
+            <select
+              style={{ float: "right" }}
+              {...register(`levelChoices.${levelIndex}.asis.0`)}
+            >
+              {Object.values(Stat).map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ width: 300, height: 30 }}>
+            <label
+              style={{ float: "left" }}
+              htmlFor={`levelChoices.${levelIndex}.asi1`}
+            >
+              ASI 2:{" "}
+            </label>
+            <select
+              style={{ float: "right" }}
+              {...register(`levelChoices.${levelIndex}.asis.1`)}
+            >
+              {Object.values(Stat).map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+      {miscFeatures?.length > 0 && (
+        <>
+          <b>Features:</b>
+          <ul>
+            {miscFeatures.map((miscFeature) => (
+              <li key={`${miscFeature.id}`}>
+                {miscFeature.id} {miscFeature.tier && `(${miscFeature.tier})`}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -192,7 +241,7 @@ export const CharacterSheetAndGeneratorView = () => {
       style={{
         display: "flex",
         flexDirection: "row",
-        width: "100%",
+        gap: 150,
       }}
     >
       <CharacterGeneratorView
