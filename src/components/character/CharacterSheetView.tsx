@@ -1,7 +1,4 @@
-import {
-  basicFighter,
-  CalculatedCharacterV1,
-} from "../../types/characterBuilder";
+import { basicFighter, CalculatedCharacterV1 } from "./characterBuilder";
 import { Proficiency, SkillsByStat } from "../../types/skills";
 import { Stat } from "../../types/stats";
 

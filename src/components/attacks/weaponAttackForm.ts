@@ -1,4 +1,4 @@
-import { Character, WeaponAttack } from "../../types/character";
+import { Character, WeaponAttack } from "./character";
 import { DamageType } from "../../types/damageTypes";
 import { DamageDie } from "../../types/dice";
 import { Stat } from "../../types/stats";

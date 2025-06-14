@@ -1,15 +1,12 @@
-import { Stat, StatArray } from "./stats";
+import { Stat, StatArray } from "../../types/stats";
 import {
   Proficiency,
   Skill,
   SkillProficiencyArray,
   StatsBySkill,
-} from "./skills";
-import { LevelChoices } from "../components/character/CharacterGeneratorView";
-import {
-  CharacterClass,
-  MiscFeature,
-} from "./characterClasses/characterClasses";
+} from "../../types/skills";
+import { LevelChoices } from "./CharacterGeneratorView";
+import { CharacterClass, MiscFeature } from "../../types/characterClasses";
 
 // Proficiencies:
 // Tools, weapons, instruments, armor, languages?
@@ -144,7 +141,7 @@ const generateCharacterAtLevel = (
     }
   });
 
-  const proficiencyBonus = Math.floor(targetLevel / 4) + 2;
+  const proficiencyBonus = Math.floor((targetLevel - 1) / 4) + 2;
   return {
     name,
     totalLevel: targetLevel,

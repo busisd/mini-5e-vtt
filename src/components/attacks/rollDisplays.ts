@@ -1,4 +1,4 @@
-import { AttackRollResult, DamageRollResult } from "../../types/character";
+import { AttackRollResult, DamageRollResult } from "./character";
 import { DieRoll } from "../../types/dice";
 import { plaintextSvg, sidesToSvg, svgElement } from "../../svg/diceSvgOld";
 

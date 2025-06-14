@@ -1,4 +1,4 @@
-import { CalculatedCharacterV1 } from "../../types/characterBuilder";
+import { CalculatedCharacterV1 } from "./characterBuilder";
 import { Stat } from "../../types/stats";
 
 const StatBox = ({

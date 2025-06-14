@@ -4,13 +4,10 @@ import {
   CharacterClass,
   CharacterClassLevels,
   ClassHitDie,
-} from "../../types/characterClasses/characterClasses";
+} from "../../types/characterClasses";
 import { CharacterSheetView } from "./CharacterSheetView";
 import { useEffect, useMemo, useState } from "react";
-import {
-  basicFighter,
-  generateCharacterAtEachLevel,
-} from "../../types/characterBuilder";
+import { basicFighter, generateCharacterAtEachLevel } from "./characterBuilder";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),

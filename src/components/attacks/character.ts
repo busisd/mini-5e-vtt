@@ -1,9 +1,9 @@
 import maxBy from "lodash/maxBy";
 import minBy from "lodash/minBy";
-import { Stat, StatArray } from "./stats";
-import { D20, DamageDie, DamageDieRoll, DieRoll } from "./dice";
-import { DamageTypeMap } from "./damageTypes";
-import { minOne } from "../util/util";
+import { Stat, StatArray } from "../../types/stats";
+import { D20, DamageDie, DamageDieRoll, DieRoll } from "../../types/dice";
+import { DamageTypeMap } from "../../types/damageTypes";
+import { minOne } from "../../util/util";
 
 export class Character {
   stats: StatArray;
