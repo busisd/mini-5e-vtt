@@ -1,6 +1,9 @@
-import { basicFighter, CalculatedCharacter } from "../types/characterBuilder";
-import { Proficiency, SkillsByStat } from "../types/skills";
-import { Stat } from "../types/stats";
+import {
+  basicFighter,
+  CalculatedCharacterV1,
+} from "../../types/characterBuilder";
+import { Proficiency, SkillsByStat } from "../../types/skills";
+import { Stat } from "../../types/stats";
 
 const STANDARD_PRINT_DPI = 96;
 const STANDARD_PRINTABLE_WIDTH = 8;
@@ -28,7 +31,7 @@ const StatValues = ({
   character,
   stat,
 }: {
-  character: CalculatedCharacter;
+  character: CalculatedCharacterV1;
   stat: Stat;
 }) => {
   return (
@@ -163,7 +166,11 @@ const StatValues = ({
   );
 };
 
-const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => (
+const CharacterSheet = ({
+  character,
+}: {
+  character: CalculatedCharacterV1;
+}) => (
   <div
     style={{
       width: PIXEL_WIDTH,
@@ -201,7 +208,7 @@ const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => (
 export const CharacterSheetView = ({
   calculatedCharacter = basicFighter[0],
 }: {
-  calculatedCharacter?: CalculatedCharacter;
+  calculatedCharacter?: CalculatedCharacterV1;
 }) => {
   // const [calculatedCharacter, setCalculatedCharacter] = useState(
   //   exampleCalculatedCharacter[3],

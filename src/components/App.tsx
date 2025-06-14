@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import TabContainer from "./TabContainer";
-import AttacksView from "./AttacksView";
-import CharactersView from "./CharactersView";
-import MapView from "./MapView";
-import DiceRollerView from "./DiceRollerView";
-import { CharacterSheetView } from "./CharacterSheetView";
-import { CharacterSheetAndGeneratorView } from "./CharacterGeneratorView";
+import AttacksView from "./attacks/AttacksView";
+import CharactersView from "./character/CharactersView";
+import MapView from "./map/MapView";
+import DiceRollerView from "./dicerolls/DiceRollerView";
+import { CharacterSheetView } from "./character/CharacterSheetView";
+import { CharacterSheetAndGeneratorView } from "./character/CharacterGeneratorView";
 
 export const Tabs = {
   Attacks: "attacks",

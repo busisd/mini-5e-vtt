@@ -1,5 +1,5 @@
 import { Field, Form, Formik } from "formik";
-import { Stat } from "../../types/stats";
+import { Stat } from "../../../types/stats";
 
 const TestForm = () => {
   return (

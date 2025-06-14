@@ -1,14 +1,14 @@
 import React, { useCallback, useState } from "react";
-import DieSvg, { TextSvg } from "../svg/DieSvg";
+import DieSvg, { TextSvg } from "../../svg/DieSvg";
 import {
   DiceExpressionResult,
   evaluateDiceExpression,
   EvaluatedResultEntry,
-} from "../util/rollexpression/rollExpressionEvaluator";
+} from "../../util/rollexpression/rollExpressionEvaluator";
 import {
   OperatorType,
   ParenType,
-} from "../util/rollexpression/rollExpressionParser";
+} from "../../util/rollexpression/rollExpressionParser";
 import "./DiceRollerView.css";
 import { Field, Form, Formik } from "formik";
 

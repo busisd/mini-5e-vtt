@@ -1,16 +1,16 @@
 import { useForm, UseFormRegister } from "react-hook-form";
-import { Stat, StatArray } from "../types/stats";
+import { Stat, StatArray } from "../../types/stats";
 import {
   CharacterClass,
   CharacterClassLevels,
   ClassHitDie,
-} from "../types/characterClasses/characterClasses";
+} from "../../types/characterClasses/characterClasses";
 import { CharacterSheetView } from "./CharacterSheetView";
 import { useEffect, useMemo, useState } from "react";
 import {
   basicFighter,
   generateCharacterAtEachLevel,
-} from "../types/characterBuilder";
+} from "../../types/characterBuilder";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),
@@ -291,13 +291,15 @@ export const CharacterSheetAndGeneratorView = () => {
             console.log(data);
           })}
         >
-          <input type="submit" value="Test" />
-          <br />
-          See character at:{" "}
-          <select {...register("levelToView", { valueAsNumber: true })}>
+          <label htmlFor="levelToView">See character at: </label>
+          <select
+            id="levelToView"
+            {...register("levelToView", { valueAsNumber: true })}
+          >
             {levelViewOptions}
           </select>
         </form>
+        <br />
         <CharacterSheetView
           calculatedCharacter={calculatedCharacter[levelToView]}
         />

@@ -5,7 +5,7 @@ import {
   SkillProficiencyArray,
   StatsBySkill,
 } from "./skills";
-import { LevelChoices } from "../components/CharacterGeneratorView";
+import { LevelChoices } from "../components/character/CharacterGeneratorView";
 import {
   CharacterClass,
   MiscFeature,
@@ -33,7 +33,7 @@ type SaveProficiencyArray = {
   [key in Stat]: boolean;
 };
 
-export type CalculatedCharacter = {
+export type CalculatedCharacterV1 = {
   name: string;
   totalLevel: number;
   maxHp: number;
@@ -120,7 +120,7 @@ const generateCharacterAtLevel = (
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
   targetLevel: number,
-): CalculatedCharacter => {
+): CalculatedCharacterV1 => {
   const levelBonusesInRange = levelBonuses.slice(0, targetLevel);
   let targetLevelSkillProficiencies = baseSkillProficiencyArray;
 
@@ -171,7 +171,7 @@ export const generateCharacterAtEachLevel = (
   name: string,
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
-) => {
+): CalculatedCharacterV1[] => {
   const characterByLevel = [];
   for (let level = 1; level <= levelBonuses.length; level++) {
     characterByLevel.push(

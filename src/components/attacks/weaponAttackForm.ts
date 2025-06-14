@@ -1,7 +1,7 @@
-import { Character, WeaponAttack } from "../types/character";
-import { DamageType } from "../types/damageTypes";
-import { DamageDie } from "../types/dice";
-import { Stat } from "../types/stats";
+import { Character, WeaponAttack } from "../../types/character";
+import { DamageType } from "../../types/damageTypes";
+import { DamageDie } from "../../types/dice";
+import { Stat } from "../../types/stats";
 import { addResults } from "./rollDisplays";
 
 const statDropdown = (id = "attackStat") => {

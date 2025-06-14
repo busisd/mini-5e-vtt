@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Stat } from "../../types/stats";
+import { Stat } from "../../../types/stats";
 
 const StatDropdown = () => {
   return (
