@@ -1,6 +1,4 @@
-import {
-  CalculatedCharacter,
-} from "../types/characterBuilder";
+import { CalculatedCharacter } from "../types/characterBuilder";
 import { Stat } from "../types/stats";
 
 const StatBox = ({
@@ -197,7 +195,11 @@ const SaveBox = ({
   );
 };
 
-export const CharacterSheetV1 = ({ character }: { character: CalculatedCharacter }) => {
+export const CharacterSheetV1 = ({
+  character,
+}: {
+  character: CalculatedCharacter;
+}) => {
   return (
     <div
       style={{

@@ -1,7 +1,4 @@
-import {
-  basicFighter,
-  CalculatedCharacter,
-} from "../types/characterBuilder";
+import { basicFighter, CalculatedCharacter } from "../types/characterBuilder";
 import { Proficiency, SkillsByStat } from "../types/skills";
 import { Stat } from "../types/stats";
 
@@ -180,7 +177,9 @@ const CharacterSheet = ({ character }: { character: CalculatedCharacter }) => (
   >
     <div style={{ gridColumnStart: 1, gridColumnEnd: 7, padding: 4 }}>
       <div style={{ fontFamily: "Georgia", fontSize: 20, fontWeight: 700 }}>
-        Placeholder name
+        {character.name != null && character.name !== ""
+          ? character.name
+          : "Placeholder name"}
       </div>
       <div style={{ fontFamily: "monospace", fontSize: 18 }}>
         Level: {character.totalLevel}

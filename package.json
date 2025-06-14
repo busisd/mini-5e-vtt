@@ -2,7 +2,8 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
-    "start": "webpack serve --open"
+    "start": "webpack serve --open",
+    "format": "npx prettier src/**/*.ts* -w"
   },
   "dependencies": {
     "express": "^4.19.2",

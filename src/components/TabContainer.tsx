@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import upperFirst from "lodash/upperFirst";
-import "./TabContainer.css"
+import "./TabContainer.css";
 
 const TAB_SELECTED = "tab-selected";
 const TAB_UNSELECTED = "tab-unselected";
@@ -38,7 +38,7 @@ const Tab = ({
 const TabContainer = ({
   selectedId,
   setSelectedId,
-  tabIds
+  tabIds,
 }: {
   selectedId: string;
   setSelectedId: SetState<string>;

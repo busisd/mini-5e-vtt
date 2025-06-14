@@ -6,13 +6,18 @@ import {
   StatsBySkill,
 } from "./skills";
 import { LevelChoices } from "../components/CharacterGeneratorView";
-import { CharacterClass } from "./characterClasses/characterClasses";
+import {
+  CharacterClass,
+  MiscFeature,
+} from "./characterClasses/characterClasses";
 
 // Proficiencies:
 // Tools, weapons, instruments, armor, languages?
 // Feats/abilities?
 // Actions, bonus actions, reactions?
 // Vision, movement?
+// Misc features
+// "Level 0" characters?
 
 // Spells learned/forgotten
 
@@ -29,6 +34,7 @@ type SaveProficiencyArray = {
 };
 
 export type CalculatedCharacter = {
+  name: string;
   totalLevel: number;
   maxHp: number;
   stats: StatArray;
@@ -38,6 +44,7 @@ export type CalculatedCharacter = {
   skillBonuses: SkillBonusArray;
   saveProficiencies: SaveProficiencyArray;
   saveBonuses: StatArray;
+  miscFeatures?: MiscFeature[];
 };
 
 const generateSkillBonusArray = (
@@ -91,7 +98,6 @@ export type LevelBonus = LevelChoices & {
 const addASIBonus = (stats: StatArray, asis: Stat[]): StatArray => {
   const newStats = { ...stats };
   for (const stat of asis) {
-    console.log("HMM2", newStats, stat);
     newStats[stat] += 1;
   }
   return newStats;
@@ -110,6 +116,7 @@ const addSkillProficiencies = (
 };
 
 const generateCharacterAtLevel = (
+  name: string,
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
   targetLevel: number,
@@ -120,8 +127,6 @@ const generateCharacterAtLevel = (
   let targetLevelStats = baseStats;
   levelBonusesInRange.forEach((levelBonus) => {
     if (levelBonus.asis != null) {
-      console.log("!!", levelBonus.asis);
-      console.log("HMM", targetLevelStats);
       targetLevelStats = addASIBonus(targetLevelStats, levelBonus.asis);
     }
   });
@@ -141,6 +146,7 @@ const generateCharacterAtLevel = (
 
   const proficiencyBonus = Math.floor(targetLevel / 4) + 2;
   return {
+    name,
     totalLevel: targetLevel,
     maxHp: targetLevelHp,
     stats: targetLevelStats,
@@ -162,13 +168,14 @@ const generateCharacterAtLevel = (
 };
 
 export const generateCharacterAtEachLevel = (
+  name: string,
   baseStats: StatArray,
   levelBonuses: LevelBonus[],
 ) => {
   const characterByLevel = [];
   for (let level = 1; level <= levelBonuses.length; level++) {
     characterByLevel.push(
-      generateCharacterAtLevel(baseStats, levelBonuses, level),
+      generateCharacterAtLevel(name, baseStats, levelBonuses, level),
     );
   }
   return characterByLevel;
@@ -233,6 +240,7 @@ const exampleLevelBonuses: LevelBonus[] = [
 ];
 
 export const exampleCalculatedCharacter = generateCharacterAtEachLevel(
+  "Placeholder name",
   exampleBaseStatArray,
   exampleLevelBonuses,
 );
@@ -247,6 +255,7 @@ const basicFighterBaseStatArray: StatArray = {
 };
 
 export const basicFighter = generateCharacterAtEachLevel(
+  "Placeholder name",
   basicFighterBaseStatArray,
   [{ hp: 10, characterClass: CharacterClass.FIGHTER }],
 );
