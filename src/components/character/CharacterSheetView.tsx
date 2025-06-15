@@ -1,6 +1,7 @@
 import { basicFighter, CalculatedCharacterV1 } from "./characterBuilder";
 import { Proficiency, SkillsByStat } from "../../types/skills";
 import { Stat } from "../../types/stats";
+import { CharacterSheetData } from "../../types/characterSheetData";
 
 const STANDARD_PRINT_DPI = 96;
 const STANDARD_PRINTABLE_WIDTH = 8;
@@ -24,7 +25,7 @@ const proficiencySymbol = (proficiency: Proficiency) => {
   }
 };
 
-const StatValues = ({
+const StatValuesV1 = ({
   character,
   stat,
 }: {
@@ -163,7 +164,7 @@ const StatValues = ({
   );
 };
 
-const CharacterSheet = ({
+const CharacterSheetV2 = ({
   character,
 }: {
   character: CalculatedCharacterV1;
@@ -197,7 +198,7 @@ const CharacterSheet = ({
       </div>
     </div>
     {Object.values(Stat).map((stat) => (
-      <StatValues key={stat} character={character} stat={stat} />
+      <StatValuesV1 key={stat} character={character} stat={stat} />
     ))}
   </div>
 );
@@ -240,7 +241,7 @@ export const CharacterSheetView = ({
         <textarea {...register("importedCharacter")} />
         <input type="submit" />
       </form> */}
-      <CharacterSheet character={calculatedCharacter} />
+      <CharacterSheetV2 character={calculatedCharacter} />
     </>
   );
 };

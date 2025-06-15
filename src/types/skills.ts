@@ -77,3 +77,7 @@ export enum Proficiency {
 export type SkillProficiencyArray = {
   [key in Skill]: Proficiency;
 };
+
+export type SkillBonusArray = {
+  [key in Skill]: number;
+};

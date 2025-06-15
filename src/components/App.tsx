@@ -4,14 +4,12 @@ import AttacksView from "./attacks/AttacksView";
 import CharactersView from "./character/CharactersView";
 import MapView from "./map/MapView";
 import DiceRollerView from "./dicerolls/DiceRollerView";
-import { CharacterSheetView } from "./character/CharacterSheetView";
 import { CharacterSheetAndGeneratorView } from "./character/CharacterGeneratorView";
 
 export const Tabs = {
   Attacks: "attacks",
   Characters: "characters",
   CharacterGenerator: "characterGenerator",
-  CharacterSheet: "CharacterSheet",
   Map: "map",
   DiceRoller: "dice roller",
 };
@@ -21,7 +19,6 @@ const TabViews = {
   [Tabs.Attacks]: AttacksView,
   [Tabs.Characters]: CharactersView,
   [Tabs.CharacterGenerator]: CharacterSheetAndGeneratorView,
-  [Tabs.CharacterSheet]: CharacterSheetView,
   [Tabs.Map]: MapView,
   [Tabs.DiceRoller]: DiceRollerView,
 };

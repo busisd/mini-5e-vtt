@@ -10,3 +10,7 @@ export enum Stat {
 export type StatArray = {
   [key in Stat]: number;
 };
+
+export type SaveProficiencyArray = {
+  [key in Stat]: boolean;
+};

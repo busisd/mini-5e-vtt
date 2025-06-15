@@ -12,33 +12,33 @@ export const ClassHitDie = {
   [CharacterClass.WIZARD]: 6,
 };
 
-enum MiscFeatureId {
+export enum MiscFeatureId {
   // Cleric
-  CHANNEL_DIVINITY = "Channel divinity",
-  DESTROY_UNDEAD = "Destroy undead",
+  CHANNEL_DIVINITY = "Channel Divinity",
+  DESTROY_UNDEAD = "Destroy Undead",
   DIVINE_INTERVENTION = "Divine Intervention",
   // Fighter
-  FIGHTING_STYLE = "Fighting style",
-  SECOND_WIND = "Second wind",
-  ACTION_SURGE = "Action surge",
-  EXTRA_ATTACK = "Extra attack",
+  FIGHTING_STYLE = "Fighting Style",
+  SECOND_WIND = "Second Wind",
+  ACTION_SURGE = "Action Surge",
+  EXTRA_ATTACK = "Extra Attack",
   INDOMITABLE = "Indomitable",
   // Rogue
   EXPERTISE = "Expertise",
-  SNEAK_ATTACK = "Sneak attack",
-  THIEVES_CANT = "Thieves' cant",
-  CUNNING_ACTION = "Cunning action",
-  UNCANNY_DODGE = "Uncanny dodge",
+  SNEAK_ATTACK = "Sneak Attack",
+  THIEVES_CANT = "Thieves' Cant",
+  CUNNING_ACTION = "Cunning Action",
+  UNCANNY_DODGE = "Uncanny Dodge",
   EVASION = "Evasion",
-  RELIABLE_TALENT = "Reliable talent",
+  RELIABLE_TALENT = "Reliable Talent",
   BLINDSENSE = "Blindsense",
-  SLIPPERY_MIND = "Slippery mind",
+  SLIPPERY_MIND = "Slippery Mind",
   ELUSIVE = "Elusive",
-  STROKE_OF_LUCK = "Stroke of luck",
+  STROKE_OF_LUCK = "Stroke of Luck",
   // Wizard
-  ARCANE_RECOVERY = "Arcane recovery",
-  SPELL_MASTERY = "Spell mastery",
-  SIGNATURE_SPELLS = "Signature spells",
+  ARCANE_RECOVERY = "Arcane Recovery",
+  SPELL_MASTERY = "Spell Mastery",
+  SIGNATURE_SPELLS = "Signature Spells",
 }
 
 export type MiscFeature = {

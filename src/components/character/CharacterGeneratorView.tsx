@@ -1,13 +1,16 @@
+import { useEffect, useMemo, useState } from "react";
 import { useForm, UseFormRegister } from "react-hook-form";
-import { Stat, StatArray } from "../../types/stats";
 import {
   CharacterClass,
   CharacterClassLevels,
   ClassHitDie,
 } from "../../types/characterClasses";
-import { CharacterSheetView } from "./CharacterSheetView";
-import { useEffect, useMemo, useState } from "react";
-import { basicFighter, generateCharacterAtEachLevel } from "./characterBuilder";
+import { Stat, StatArray } from "../../types/stats";
+import {
+  exampleCharacterSheetData,
+  generateCharacterSheetDataAtEachLevel,
+} from "./characterBuilder";
+import { CharacterSheet } from "./CharacterSheet";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),
@@ -234,7 +237,9 @@ const LevelChoicesSelector = ({
 };
 
 export const CharacterSheetAndGeneratorView = () => {
-  const [calculatedCharacter, setCalculatedCharacter] = useState(basicFighter);
+  const [calculatedCharacter, setCalculatedCharacter] = useState([
+    exampleCharacterSheetData,
+  ]);
 
   const { register, watch, setValue, handleSubmit } = useForm({
     defaultValues: {
@@ -242,7 +247,6 @@ export const CharacterSheetAndGeneratorView = () => {
     },
   });
   const levelToView = watch("levelToView");
-  console.log("Re-rendering with levelToView:", levelToView);
 
   const levelViewOptions = useMemo(() => {
     return calculatedCharacter.map((_character, charLevel) => (
@@ -270,16 +274,11 @@ export const CharacterSheetAndGeneratorView = () => {
     >
       <CharacterGeneratorView
         onSubmitCallback={(formData) => {
-          const calculatedImportedCharacter = generateCharacterAtEachLevel(
-            formData?.characterName ?? "Placeholder name",
-            formData.baseStats,
-            formData.levelChoices,
-          );
-          setCalculatedCharacter(calculatedImportedCharacter);
-          console.log(
-            "Setting levelToView to:",
-            calculatedImportedCharacter.length - 1,
-          );
+          const calculatedImportedCharacter =
+            generateCharacterSheetDataAtEachLevel(formData);
+          if (calculatedImportedCharacter.length > 0) {
+            setCalculatedCharacter(calculatedImportedCharacter);
+          }
         }}
       />
       <div>
@@ -297,9 +296,7 @@ export const CharacterSheetAndGeneratorView = () => {
           </select>
         </form>
         <br />
-        <CharacterSheetView
-          calculatedCharacter={calculatedCharacter[levelToView]}
-        />
+        <CharacterSheet data={calculatedCharacter[levelToView]} />
       </div>
     </div>
   );
