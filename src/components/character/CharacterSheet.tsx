@@ -60,7 +60,7 @@ const MovementDisplay = ({ movement }: { movement: Movement[] }) => {
 
 const hitDiceString = (hitDice: HitDice) => `${hitDice.number}d${hitDice.size}`;
 const HitDiceDisplay = ({ hitDice }: { hitDice: HitDice[] }) => {
-  return hitDice.map(hitDiceString).join(", ");
+  return hitDice.map(hitDiceString).join(" + ");
 };
 
 const bonusLabel = (bonus: number) =>
@@ -287,14 +287,14 @@ export const CharacterSheet = ({ data }: { data: CharacterSheetData }) => {
         )}
         <TopOfSheetValue label="HP">{data.maxHp}</TopOfSheetValue>
         <TopOfSheetValue label="Hit Dice">
-          {<HitDiceDisplay hitDice={data.hitDice} />}
+          <HitDiceDisplay hitDice={data.hitDice} />
         </TopOfSheetValue>
         <TopOfSheetValue label="AC">{data.armorClass}</TopOfSheetValue>
         <TopOfSheetValue label="PB">
           {bonusLabel(data.proficiencyBonus)}
         </TopOfSheetValue>
         <TopOfSheetValue label="Move">
-          {<MovementDisplay movement={data.movement} />}
+          <MovementDisplay movement={data.movement} />
         </TopOfSheetValue>
       </div>
       {Object.values(Stat).map((stat) => (

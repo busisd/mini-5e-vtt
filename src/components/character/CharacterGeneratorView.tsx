@@ -6,11 +6,9 @@ import {
   ClassHitDie,
 } from "../../types/characterClasses";
 import { Stat, StatArray } from "../../types/stats";
-import {
-  exampleCharacterSheetData,
-  generateCharacterSheetDataAtEachLevel,
-} from "./characterBuilder";
+import { generateCharacterSheetDataAtEachLevel } from "./characterBuilder";
 import { CharacterSheet } from "./CharacterSheet";
+import { exampleCharacterSheetData } from "./exampleCharacters";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),

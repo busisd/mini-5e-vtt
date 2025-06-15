@@ -1,7 +1,7 @@
-import { basicFighter, CalculatedCharacterV1 } from "./characterBuilder";
+import { CalculatedCharacterV1 } from "./characterBuilder";
 import { Proficiency, SkillsByStat } from "../../types/skills";
 import { Stat } from "../../types/stats";
-import { CharacterSheetData } from "../../types/characterSheetData";
+import { basicFighter } from "./exampleCharacters";
 
 const STANDARD_PRINT_DPI = 96;
 const STANDARD_PRINTABLE_WIDTH = 8;

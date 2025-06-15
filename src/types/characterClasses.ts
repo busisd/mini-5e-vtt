@@ -1,3 +1,5 @@
+import { Stat } from "./stats";
+
 export enum CharacterClass {
   CLERIC = "Cleric",
   FIGHTER = "Fighter",
@@ -10,6 +12,13 @@ export const ClassHitDie = {
   [CharacterClass.FIGHTER]: 10,
   [CharacterClass.ROGUE]: 8,
   [CharacterClass.WIZARD]: 6,
+};
+
+export const ClassSaveProficiencies = {
+  [CharacterClass.CLERIC]: [Stat.WIS, Stat.CHA],
+  [CharacterClass.FIGHTER]: [Stat.STR, Stat.CON],
+  [CharacterClass.ROGUE]: [Stat.DEX, Stat.INT],
+  [CharacterClass.WIZARD]: [Stat.INT, Stat.WIS],
 };
 
 export enum MiscFeatureId {
