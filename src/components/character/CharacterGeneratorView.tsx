@@ -9,6 +9,7 @@ import { Stat, StatArray } from "../../types/stats";
 import { generateCharacterSheetDataAtEachLevel } from "./characterBuilder";
 import { CharacterSheet } from "./CharacterSheet";
 import { exampleCharacterSheetData } from "./exampleCharacters";
+import { Species } from "../../types/species";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),
@@ -25,6 +26,7 @@ export type CharacterGeneratorFormData = {
   characterName?: string;
   baseStats: StatArray;
   levelChoices: LevelChoices[];
+  species: Species;
 
   // Used within the form itself
   characterClassToAdd: CharacterClass;
@@ -38,7 +40,7 @@ const levelsInClass = (
     (chosenClass) => chosenClass.characterClass === characterClass,
   ).length;
 
-export const CharacterGeneratorView = ({
+export const CharacterGeneratorForm = ({
   onSubmitCallback,
 }: {
   onSubmitCallback?: (data: CharacterGeneratorFormData) => void;
@@ -49,68 +51,89 @@ export const CharacterGeneratorView = ({
         baseStats: { ...defaultBaseStats },
         characterClassToAdd: CharacterClass.FIGHTER,
         levelChoices: [],
+        species: Species.DWARF,
       },
     });
   const addedLevels = watch("levelChoices");
 
   return (
-    <>
-      <form
-        onSubmit={handleSubmit((data) => {
-          console.log(data);
-          onSubmitCallback?.(data as CharacterGeneratorFormData);
-        })}
-      >
-        <p>
-          <label htmlFor="characterName">Name:</label>{" "}
-          <input id="characterName" {...register("characterName")} />
-        </p>
-        <p>
-          <select {...register("characterClassToAdd")}>
-            {Object.values(CharacterClass).map((characterClass) => (
-              <option key={characterClass} value={characterClass}>
-                {characterClass}
-              </option>
-            ))}
-          </select>{" "}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              const addedClass: CharacterClass = getValues(
-                "characterClassToAdd",
-              );
-              const totalLevels = addedLevels.length;
-
-              setValue("levelChoices", [
-                ...addedLevels,
-                {
-                  characterClass: addedClass,
-                  hp:
-                    totalLevels === 0
-                      ? ClassHitDie[addedClass]
-                      : ClassHitDie[addedClass] / 2 + 1,
-                },
-              ]);
-            }}
-          >
-            Add level
-          </button>
-        </p>
-        <b>Starting stats:</b>
+    <form
+      onSubmit={handleSubmit((data) => {
+        console.log(data);
+        onSubmitCallback?.(data as CharacterGeneratorFormData);
+      })}
+    >
+      <input type="submit" />
+      <p>
+        <h3>Name:</h3>
+        <input id="characterName" {...register("characterName")} />
+      </p>
+      <p>
+        <h3>Species:</h3>
+        <select {...register("species")}>
+          {Object.values(Species).map((species) => (
+            <option key={species} value={species}>
+              {species}
+            </option>
+          ))}
+        </select>
+      </p>
+      <p>
+        <h3>Background:</h3>
+        <select>
+          {Object.values(["Acolyte"]).map((background) => (
+            <option key={background} value={background}>
+              {background}
+            </option>
+          ))}
+        </select>
+      </p>
+      <p>
+        <h3>Starting stats:</h3>
         <BaseStatsSelector register={register} />
-        {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => (
-          <LevelChoicesSelector
-            register={register}
-            levelChoices={levelChoices}
-            levelIndex={levelIndex}
-            allLevelChoices={addedLevels}
-            key={`levelChoices.${levelIndex}`}
-          />
-        ))}
-        <input type="submit" />
-      </form>
-    </>
+      </p>
+      <p>
+        <h3>Character levels:</h3>
+        <select {...register("characterClassToAdd")}>
+          {Object.values(CharacterClass).map((characterClass) => (
+            <option key={characterClass} value={characterClass}>
+              {characterClass}
+            </option>
+          ))}
+        </select>{" "}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            const addedClass: CharacterClass = getValues("characterClassToAdd");
+            const totalLevels = addedLevels.length;
+
+            setValue("levelChoices", [
+              ...addedLevels,
+              {
+                characterClass: addedClass,
+                hp:
+                  totalLevels === 0
+                    ? ClassHitDie[addedClass]
+                    : ClassHitDie[addedClass] / 2 + 1,
+              },
+            ]);
+          }}
+        >
+          Add level
+        </button>
+      </p>
+      {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => (
+        <LevelChoicesSelector
+          register={register}
+          levelChoices={levelChoices}
+          levelIndex={levelIndex}
+          allLevelChoices={addedLevels}
+          key={`levelChoices.${levelIndex}`}
+        />
+      ))}
+      <input type="submit" />
+    </form>
   );
 };
 
@@ -156,10 +179,10 @@ const LevelChoicesSelector = ({
 
   return (
     <div>
-      <h3>
+      <h4>
         Level {levelIndex + 1} ({levelChoices.characterClass} {chosenClassLevel}
         ):
-      </h3>
+      </h4>
       <div style={{ width: 300, height: 30 }}>
         <label
           style={{ float: "left" }}
@@ -270,7 +293,7 @@ export const CharacterSheetAndGeneratorView = () => {
         gap: 150,
       }}
     >
-      <CharacterGeneratorView
+      <CharacterGeneratorForm
         onSubmitCallback={(formData) => {
           const calculatedImportedCharacter =
             generateCharacterSheetDataAtEachLevel(formData);
