@@ -4,14 +4,12 @@ import {
   ClassHitDie,
   ClassSaveProficiencies,
   MiscFeature,
-  MiscFeatureId,
 } from "../../types/characterClasses";
 import {
   CharacterClassLevelData,
   CharacterSheetData,
   HitDice,
 } from "../../types/characterSheetData";
-import { MovementType } from "../../types/movement";
 import {
   Proficiency,
   Skill,
@@ -19,6 +17,7 @@ import {
   SkillProficiencyArray,
   StatsBySkill,
 } from "../../types/skills";
+import { BonusesBySpecies } from "../../types/species";
 import { SaveProficiencyArray, Stat, StatArray } from "../../types/stats";
 import { isEmptyStr } from "../../util/util";
 import {
@@ -192,6 +191,8 @@ const generateCharacterSheetDataAtLevel = (
   formData: CharacterGeneratorFormData,
   targetLevel: number,
 ): CharacterSheetData => {
+  const speciesBonuses = BonusesBySpecies[formData.species];
+
   const firstLevelClass = formData.levelChoices[0].characterClass;
   const saveProficiencies = { ...baseSaveProficiencies };
   ClassSaveProficiencies[firstLevelClass].forEach((stat) => {
@@ -203,6 +204,11 @@ const generateCharacterSheetDataAtLevel = (
   const targetLevelSkillProficiencies = { ...baseSkillProficiencies };
 
   let targetLevelStats = formData.baseStats;
+  speciesBonuses.asis.forEach((asi) => {
+    const newStats = { ...targetLevelStats };
+    newStats[asi.stat] += asi.amount;
+    targetLevelStats = newStats;
+  });
   levelChoicesInRange.forEach((levelChoice) => {
     if (levelChoice.asis != null) {
       targetLevelStats = addASIBonus(targetLevelStats, levelChoice.asis);
@@ -210,7 +216,9 @@ const generateCharacterSheetDataAtLevel = (
   });
   const targetLevelStatMods = generateStatModsArray(targetLevelStats);
 
-  const features: MiscFeatureId[] = [];
+  const features: string[] = [];
+  features.push(...speciesBonuses.miscBonuses.map((miscBonus) => miscBonus.id));
+
   const currentLevels = Object.fromEntries(
     Object.values(CharacterClass).map((characterClass: CharacterClass) => [
       characterClass,
@@ -268,6 +276,7 @@ const generateCharacterSheetDataAtLevel = (
     alignment: "Neutral good",
     maxHp: targetLevelHp,
     stats: targetLevelStats,
+    size: speciesBonuses.size,
     statMods: targetLevelStatMods,
     proficiencyBonus,
     skillProficiencies: targetLevelSkillProficiencies,
@@ -282,11 +291,11 @@ const generateCharacterSheetDataAtLevel = (
       saveProficiencies,
       proficiencyBonus,
     ),
-    race: "Human",
+    species: formData.species,
     background: "Soldier",
     classLevels,
     armorClass: 10,
-    movement: [{ type: MovementType.WALK, amount: 30 }],
+    movement: speciesBonuses.movement,
     hitDice,
     miscProficiencies: [],
     features,

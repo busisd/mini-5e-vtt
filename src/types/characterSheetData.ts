@@ -1,5 +1,5 @@
 import { CharacterClass } from "./characterClasses";
-import { Movement } from "./movement";
+import { Movement, Size } from "./misc";
 import { Proficiency, SkillBonusArray, SkillProficiencyArray } from "./skills";
 import { SaveProficiencyArray, StatArray } from "./stats";
 
@@ -26,7 +26,8 @@ export type MiscProficiency = {
 export type CharacterSheetData = {
   name: string;
   alignment?: string;
-  race: string;
+  species: string;
+  size: Size;
   background: string;
   classLevels: CharacterClassLevelData[];
   armorClass: number;

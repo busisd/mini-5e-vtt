@@ -1,3 +1,4 @@
+import { ASI, Language, Movement, MovementType, Size } from "./misc";
 import { Stat } from "./stats";
 
 export enum Species {
@@ -12,22 +13,23 @@ export enum Species {
   // TIEFLING = "Tiefling",
 }
 
-export enum Size {
-  TINY = "Tiny",
-  SMALL = "Small",
-  MEDIUM = "Medium",
-  LARGE = "Large",
-  HUGE = "Huge",
-  GARGANTUAN = "Gargantuan",
-}
+type MiscSpeciesBonus = { id: string; amount?: number };
 
-const DwarfBonuses = {
+export type SpeciesBonuses = {
+  asis: ASI[];
+  movement: Movement[];
+  size: Size.MEDIUM;
+  miscBonuses: MiscSpeciesBonus[];
+  languages: Language[];
+};
+
+const DwarfBonuses: SpeciesBonuses = {
   asis: [
     { stat: Stat.CON, amount: 2 },
     { stat: Stat.WIS, amount: 1 },
   ],
-  baseSpeed: 25,
-  size: "Medium",
+  movement: [{ mode: MovementType.WALK, amount: 25 }],
+  size: Size.MEDIUM,
   miscBonuses: [
     { id: "Darkvision", amount: 60 },
     { id: "Dwarven Resilience" },
@@ -39,13 +41,13 @@ const DwarfBonuses = {
   languages: ["Common", "Dwarvish"],
 };
 
-const ElfBonuses = {
+const ElfBonuses: SpeciesBonuses = {
   asis: [
     { stat: Stat.DEX, amount: 2 },
     { stat: Stat.INT, amount: 1 },
   ],
-  baseSpeed: 30,
-  size: "Medium",
+  movement: [{ mode: MovementType.WALK, amount: 30 }],
+  size: Size.MEDIUM,
   miscBonuses: [
     { id: "Darkvision", amount: 60 },
     { id: "Keen Senses" },
@@ -58,7 +60,7 @@ const ElfBonuses = {
   languages: ["Common", "Elvish"],
 };
 
-export const SpeciesBonuses = {
+export const BonusesBySpecies: { [key in Species]: SpeciesBonuses } = {
   [Species.ELF]: ElfBonuses,
   [Species.DWARF]: DwarfBonuses,
 };

@@ -1,6 +1,6 @@
 import { CharacterClass, MiscFeatureId } from "../../types/characterClasses";
 import { CharacterSheetData } from "../../types/characterSheetData";
-import { MovementType } from "../../types/movement";
+import { MovementType, Size } from "../../types/misc";
 import { Proficiency, Skill } from "../../types/skills";
 import { Stat, StatArray } from "../../types/stats";
 import { generateCharacterAtEachLevelV1, LevelBonus } from "./characterBuilder";
@@ -57,11 +57,12 @@ export const basicFighter = generateCharacterAtEachLevelV1(
 export const placeholderCharacterSheetData: CharacterSheetData = {
   name: "Placeholder Name",
   alignment: "Neutral good",
-  race: "Human",
+  species: "Human",
+  size: Size.MEDIUM,
   background: "Soldier",
   classLevels: [],
   armorClass: 10,
-  movement: [{ type: MovementType.WALK, amount: 30 }],
+  movement: [{ mode: MovementType.WALK, amount: 30 }],
   maxHp: 0,
   hitDice: [],
   proficiencyBonus: 0,
@@ -147,14 +148,15 @@ export const placeholderCharacterSheetData: CharacterSheetData = {
 export const exampleCharacterSheetData: CharacterSheetData = {
   name: "John Example",
   alignment: "Neutral good",
-  race: "Human",
+  species: "Human",
+  size: Size.MEDIUM,
   background: "Soldier",
   classLevels: [
     { characterClass: CharacterClass.FIGHTER, level: 2 },
     { characterClass: CharacterClass.ROGUE, level: 1 },
   ],
   armorClass: 15,
-  movement: [{ type: MovementType.WALK, amount: 30 }],
+  movement: [{ mode: MovementType.WALK, amount: 30 }],
   maxHp: 27,
   hitDice: [
     { size: 10, number: 2 },

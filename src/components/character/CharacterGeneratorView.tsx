@@ -9,7 +9,8 @@ import { Stat, StatArray } from "../../types/stats";
 import { generateCharacterSheetDataAtEachLevel } from "./characterBuilder";
 import { CharacterSheet } from "./CharacterSheet";
 import { exampleCharacterSheetData } from "./exampleCharacters";
-import { Species } from "../../types/species";
+import { BonusesBySpecies, Species, SpeciesBonuses } from "../../types/species";
+import { ASI, Movement } from "../../types/misc";
 
 const defaultBaseStats = Object.fromEntries(
   Object.values(Stat).map((stat) => [stat, "10"]),
@@ -40,6 +41,44 @@ const levelsInClass = (
     (chosenClass) => chosenClass.characterClass === characterClass,
   ).length;
 
+const asiToString = (asi: ASI) => `${asi.stat} +${asi.amount}`;
+
+const movementToString = (movement: Movement) =>
+  `${movement.mode} ${movement.amount}'`;
+
+const SpeciesBonusesDisplay = ({ bonuses }: { bonuses: SpeciesBonuses }) => {
+  return (
+    <div>
+      <b>Features:</b>
+      <ul>
+        <li>
+          <b>ASIs:</b> {bonuses.asis.map(asiToString).join(", ")}
+        </li>
+        <li>
+          <b>Size:</b> {bonuses.size}
+        </li>
+        <li>
+          <b>Movement:</b> {bonuses.movement.map(movementToString).join(", ")}
+        </li>
+        <li>
+          <b>Languages:</b> {bonuses.languages.join(", ")}
+        </li>
+        <li>
+          <b>Features:</b>
+          <ul>
+            {bonuses.miscBonuses.map((miscBonus) => (
+              <li key={miscBonus.id}>
+                {miscBonus.id}
+                {miscBonus.amount != null && ` ${miscBonus.amount}`}
+              </li>
+            ))}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
 export const CharacterGeneratorForm = ({
   onSubmitCallback,
 }: {
@@ -55,6 +94,7 @@ export const CharacterGeneratorForm = ({
       },
     });
   const addedLevels = watch("levelChoices");
+  const species = watch("species");
 
   return (
     <form
@@ -64,21 +104,24 @@ export const CharacterGeneratorForm = ({
       })}
     >
       <input type="submit" />
-      <p>
+      <div>
         <h3>Name:</h3>
         <input id="characterName" {...register("characterName")} />
-      </p>
-      <p>
+      </div>
+      <div>
         <h3>Species:</h3>
-        <select {...register("species")}>
-          {Object.values(Species).map((species) => (
-            <option key={species} value={species}>
-              {species}
-            </option>
-          ))}
-        </select>
-      </p>
-      <p>
+        <p>
+          <select {...register("species")}>
+            {Object.values(Species).map((species) => (
+              <option key={species} value={species}>
+                {species}
+              </option>
+            ))}
+          </select>
+        </p>
+        <SpeciesBonusesDisplay bonuses={BonusesBySpecies[species]} />
+      </div>
+      <div>
         <h3>Background:</h3>
         <select>
           {Object.values(["Acolyte"]).map((background) => (
@@ -87,12 +130,12 @@ export const CharacterGeneratorForm = ({
             </option>
           ))}
         </select>
-      </p>
-      <p>
+      </div>
+      <div>
         <h3>Starting stats:</h3>
         <BaseStatsSelector register={register} />
-      </p>
-      <p>
+      </div>
+      <div>
         <h3>Character levels:</h3>
         <select {...register("characterClassToAdd")}>
           {Object.values(CharacterClass).map((characterClass) => (
@@ -122,7 +165,7 @@ export const CharacterGeneratorForm = ({
         >
           Add level
         </button>
-      </p>
+      </div>
       {addedLevels.map((levelChoices: LevelChoices, levelIndex: number) => (
         <LevelChoicesSelector
           register={register}
@@ -132,7 +175,9 @@ export const CharacterGeneratorForm = ({
           key={`levelChoices.${levelIndex}`}
         />
       ))}
-      <input type="submit" />
+      <p>
+        <input type="submit" />
+      </p>
     </form>
   );
 };

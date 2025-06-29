@@ -5,7 +5,7 @@ import {
   HitDice,
   MiscProficiency,
 } from "../../types/characterSheetData";
-import { Movement } from "../../types/movement";
+import { Movement } from "../../types/misc";
 import { Proficiency, SkillsByStat } from "../../types/skills";
 import { Stat } from "../../types/stats";
 
@@ -53,7 +53,7 @@ const LevelDisplay = ({
 };
 
 const movementString = (movement: Movement) =>
-  `${movement.type} ${movement.amount}'`;
+  `${movement.mode} ${movement.amount}'`;
 const MovementDisplay = ({ movement }: { movement: Movement[] }) => {
   return movement.map(movementString).join(", ");
 };
@@ -280,7 +280,7 @@ export const CharacterSheet = ({ data }: { data: CharacterSheetData }) => {
         <TopOfSheetValue label="Level">
           <LevelDisplay classLevels={data.classLevels} />
         </TopOfSheetValue>
-        <TopOfSheetValue label="Race">{data.race}</TopOfSheetValue>
+        <TopOfSheetValue label="Species">{data.species}</TopOfSheetValue>
         <TopOfSheetValue label="Background">{data.background}</TopOfSheetValue>
         {data.alignment && (
           <TopOfSheetValue label="Alignment">{data.alignment}</TopOfSheetValue>
